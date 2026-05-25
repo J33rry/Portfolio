@@ -26,6 +26,9 @@
     contract: { inner: 6,   outer: 12  },
   };
 
+  let snapTarget = null;
+  let isSnapping = false;
+
   // ── Mobile / Touch Detection ────────────────────────────
   const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
   if (isTouchDevice) {
@@ -68,8 +71,21 @@
     // Main animation loop via GSAP ticker
     gsap.ticker.add(() => {
       // Lerp cursor position
-      cursorX += (mouseX - cursorX) * 0.22;
-      cursorY += (mouseY - cursorY) * 0.22;
+      if (snapTarget) {
+        const rect = snapTarget.getBoundingClientRect();
+        const centerX = rect.left + rect.width / 2;
+        const centerY = rect.top + rect.height / 2;
+        
+        // Add a slight magnetic pull towards the mouse (so it moves a bit inside the button)
+        const magneticX = centerX + (mouseX - centerX) * 0.1;
+        const magneticY = centerY + (mouseY - centerY) * 0.1;
+        
+        cursorX += (magneticX - cursorX) * 0.3;
+        cursorY += (magneticY - cursorY) * 0.3;
+      } else {
+        cursorX += (mouseX - cursorX) * 0.22;
+        cursorY += (mouseY - cursorY) * 0.22;
+      }
 
       // Update cursor element
       cursor.style.left = cursorX + 'px';
@@ -121,6 +137,53 @@
         cursor.classList.remove('is-contracted');
         targetMask.inner = MASK.default.inner;
         targetMask.outer = MASK.default.outer;
+      });
+    });
+
+    // Elements that snap the cursor (buttons, specific links)
+    document.querySelectorAll('.layer__dark .js-cursor-snap').forEach(el => {
+      el.addEventListener('mouseenter', () => {
+        isSnapping = true;
+        snapTarget = el;
+        cursor.classList.add('is-snapped');
+        
+        const rect = el.getBoundingClientRect();
+        const style = window.getComputedStyle(el);
+        cursor.style.setProperty('--snap-w', rect.width + 'px');
+        cursor.style.setProperty('--snap-h', rect.height + 'px');
+        cursor.style.setProperty('--snap-r', style.borderRadius);
+        
+        // Button magnetic pull
+        gsap.killTweensOf(el);
+      });
+      
+      el.addEventListener('mousemove', (e) => {
+        if (!isSnapping) return;
+        const rect = el.getBoundingClientRect();
+        const centerX = rect.left + rect.width / 2;
+        const centerY = rect.top + rect.height / 2;
+        const distX = e.clientX - centerX;
+        const distY = e.clientY - centerY;
+        
+        gsap.to(el, {
+          x: distX * 0.3,
+          y: distY * 0.3,
+          duration: 0.4,
+          ease: 'power2.out'
+        });
+      });
+      
+      el.addEventListener('mouseleave', () => {
+        isSnapping = false;
+        snapTarget = null;
+        cursor.classList.remove('is-snapped');
+        
+        gsap.to(el, {
+          x: 0,
+          y: 0,
+          duration: 0.6,
+          ease: 'elastic.out(1, 0.4)'
+        });
       });
     });
   }
@@ -196,6 +259,25 @@
       stopReveal();
     });
     revealBtn.addEventListener('touchcancel', stopReveal);
+
+    // Keyboard Shortcut (Hold Ctrl + Shift)
+    let ctrlShiftActive = false;
+    document.addEventListener('keydown', (e) => {
+      if (e.ctrlKey && e.shiftKey && !e.altKey && !e.metaKey) {
+        if (!ctrlShiftActive && (e.key === 'Control' || e.key === 'Shift')) {
+          e.preventDefault();
+          ctrlShiftActive = true;
+          startReveal();
+        }
+      }
+    });
+    
+    document.addEventListener('keyup', (e) => {
+      if (ctrlShiftActive && (!e.ctrlKey || !e.shiftKey)) {
+        ctrlShiftActive = false;
+        stopReveal();
+      }
+    });
 
     // Cursor hover on reveal button
     if (!isTouchDevice) {
@@ -315,7 +397,9 @@
 
     floats.forEach((el) => {
       const speed = parseFloat(el.dataset.parallaxSpeed) || 0;
-      gsap.to(el, {
+      const is3D = el.hasAttribute('data-parallax-3d');
+      
+      const animProps = {
         yPercent: speed * 200,
         ease: 'none',
         scrollTrigger: {
@@ -324,7 +408,15 @@
           end: 'bottom top',
           scrub: 1,
         },
-      });
+      };
+
+      if (is3D) {
+        animProps.rotationY = speed * 360;
+        animProps.rotationX = speed * 180;
+        animProps.rotationZ = speed * 90;
+      }
+
+      gsap.to(el, animProps);
     });
   }
 

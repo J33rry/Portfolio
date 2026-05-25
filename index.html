@@ -50,12 +50,12 @@
 
       <!-- Nav -->
       <nav class="nav" id="nav">
-        <a href="#" class="nav__logo js-cursor-contract">ANIL.DEV</a>
+        <a href="#" class="nav__logo js-cursor-snap">ANIL.DEV</a>
         <div class="nav__links">
-          <a href="#about" class="nav__link js-cursor-contract">About</a>
-          <a href="#work" class="nav__link js-cursor-contract">Work</a>
-          <a href="#experience" class="nav__link js-cursor-contract">Experience</a>
-          <a href="#contact" class="nav__link js-cursor-contract">Contact</a>
+          <a href="#about" class="nav__link js-cursor-snap">About</a>
+          <a href="#work" class="nav__link js-cursor-snap">Work</a>
+          <a href="#experience" class="nav__link js-cursor-snap">Experience</a>
+          <a href="#contact" class="nav__link js-cursor-snap">Contact</a>
         </div>
       </nav>
 
@@ -114,20 +114,12 @@
             </div>
           </div>
         </div>
-        <!-- Floating parallax elements -->
-        <div class="about__float about__float--mouse" data-parallax-speed="-0.15">
-          <svg viewBox="0 0 40 64" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
-            <rect x="4" y="1" width="32" height="60" rx="16"/>
-            <line x1="20" y1="14" x2="20" y2="26"/>
-          </svg>
+        <!-- Floating 3D parallax elements -->
+        <div class="float-3d float-3d--mouse" data-parallax-speed="-0.15" data-parallax-3d>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="2" width="14" height="20" rx="7"/><path d="M12 6v4"/></svg>
         </div>
-        <div class="about__float about__float--coffee" data-parallax-speed="0.15">
-          <svg viewBox="0 0 56 52" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
-            <path d="M6 16h32v24a8 8 0 01-8 8H14a8 8 0 01-8-8z"/>
-            <path d="M38 22h6a6 6 0 010 12h-6"/>
-            <path d="M15 10c0-5 3-8 5-8s5 3 5 8"/>
-            <path d="M25 10c0-7 3-10 5-10s5 3 5 10"/>
-          </svg>
+        <div class="float-3d float-3d--coffee" data-parallax-speed="0.2" data-parallax-3d>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 8h1a4 4 0 0 1 0 8h-1"/><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/><line x1="6" y1="1" x2="6" y2="4"/><line x1="10" y1="1" x2="10" y2="4"/><line x1="14" y1="1" x2="14" y2="4"/></svg>
         </div>
       </section>
 
@@ -153,6 +145,9 @@
                 <span class="project__tag">PostgreSQL</span>
               </div>
             </div>
+            <a href="https://github.com/J33rry" class="project__link js-cursor-snap" target="_blank" rel="noopener" aria-label="GitHub Repository">
+              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+            </a>
           </article>
           <article class="project js-anim--lines--sim" data-tilt>
             <div class="project__orbit" aria-hidden="true"><span class="project__orbit-ring"></span></div>
@@ -168,6 +163,9 @@
                 <span class="project__tag">Docker</span>
               </div>
             </div>
+            <a href="https://github.com/J33rry" class="project__link js-cursor-snap" target="_blank" rel="noopener" aria-label="GitHub Repository">
+              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+            </a>
           </article>
           <article class="project js-anim--lines--sim" data-tilt>
             <div class="project__orbit" aria-hidden="true"><span class="project__orbit-ring"></span></div>
@@ -182,6 +180,9 @@
                 <span class="project__tag">Cloudinary</span>
               </div>
             </div>
+            <a href="https://github.com/J33rry" class="project__link js-cursor-snap" target="_blank" rel="noopener" aria-label="GitHub Repository">
+              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+            </a>
           </article>
           <article class="project js-anim--lines--sim" data-tilt>
             <div class="project__orbit" aria-hidden="true"><span class="project__orbit-ring"></span></div>
@@ -196,7 +197,14 @@
                 <span class="project__tag">Clerk</span>
               </div>
             </div>
+            <a href="https://github.com/J33rry" class="project__link js-cursor-snap" target="_blank" rel="noopener" aria-label="GitHub Repository">
+              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+            </a>
           </article>
+        </div>
+        <!-- Work Floating Element -->
+        <div class="float-3d float-3d--keyboard" data-parallax-speed="0.25" data-parallax-3d>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="4" width="20" height="16" rx="2" ry="2"/><path d="M6 8h.01"/><path d="M10 8h.01"/><path d="M14 8h.01"/><path d="M18 8h.01"/><path d="M8 12h.01"/><path d="M12 12h.01"/><path d="M16 12h.01"/><path d="M7 16h10"/></svg>
         </div>
       </section>
 
@@ -227,6 +235,10 @@
               <p class="experience__desc">Organised HackIndia Spark 6 — a 24-hour hackathon — managing end-to-end logistics, participant coordination, judging panels, and on-ground execution for 200+ participants.</p>
             </div>
           </div>
+        </div>
+        <!-- Experience Floating Element -->
+        <div class="float-3d float-3d--earphones" data-parallax-speed="-0.2" data-parallax-3d>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 18v-6a9 9 0 0 1 18 0v6"/><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"/></svg>
         </div>
       </section>
 
@@ -281,11 +293,11 @@
           <h2 class="section__title js-anim--chars">Let's Connect</h2>
         </div>
         <div class="contact__body">
-          <a href="mailto:anilm7017@gmail.com" class="contact__email js-cursor-contract js-anim--lines--sim">anilm7017@gmail.com</a>
+          <a href="mailto:anilm7017@gmail.com" class="contact__email js-cursor-snap js-anim--lines--sim">anilm7017@gmail.com</a>
           <div class="contact__links">
-            <a href="https://github.com/J33rry" target="_blank" rel="noopener" class="contact__link js-cursor-contract">GitHub</a>
-            <a href="https://linkedin.com/in/j33rry" target="_blank" rel="noopener" class="contact__link js-cursor-contract">LinkedIn</a>
-            <a href="Anil_SDE_Intern.pdf" target="_blank" class="contact__link js-cursor-contract">Resume ↗</a>
+            <a href="https://github.com/J33rry" target="_blank" rel="noopener" class="contact__link js-cursor-snap">GitHub</a>
+            <a href="https://linkedin.com/in/j33rry" target="_blank" rel="noopener" class="contact__link js-cursor-snap">LinkedIn</a>
+            <a href="Anil_SDE_Intern.pdf" target="_blank" class="contact__link js-cursor-snap">Resume ↗</a>
           </div>
         </div>
       </section>
@@ -376,19 +388,11 @@
             </div>
           </div>
         </div>
-        <div class="about__float about__float--mouse" data-parallax-speed="-0.15">
-          <svg viewBox="0 0 40 64" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
-            <rect x="4" y="1" width="32" height="60" rx="16"/>
-            <line x1="20" y1="14" x2="20" y2="26"/>
-          </svg>
+        <div class="float-3d float-3d--mouse" data-parallax-speed="-0.15" data-parallax-3d>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="2" width="14" height="20" rx="7"/><path d="M12 6v4"/></svg>
         </div>
-        <div class="about__float about__float--coffee" data-parallax-speed="0.15">
-          <svg viewBox="0 0 56 52" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
-            <path d="M6 16h32v24a8 8 0 01-8 8H14a8 8 0 01-8-8z"/>
-            <path d="M38 22h6a6 6 0 010 12h-6"/>
-            <path d="M15 10c0-5 3-8 5-8s5 3 5 8"/>
-            <path d="M25 10c0-7 3-10 5-10s5 3 5 10"/>
-          </svg>
+        <div class="float-3d float-3d--coffee" data-parallax-speed="0.2" data-parallax-3d>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 8h1a4 4 0 0 1 0 8h-1"/><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/><line x1="6" y1="1" x2="6" y2="4"/><line x1="10" y1="1" x2="10" y2="4"/><line x1="14" y1="1" x2="14" y2="4"/></svg>
         </div>
       </section>
 
@@ -414,6 +418,9 @@
                 <span class="project__tag">3 AM Commits</span>
               </div>
             </div>
+            <a href="https://github.com/J33rry" class="project__link js-cursor-snap" target="_blank" rel="noopener" aria-label="GitHub Repository">
+              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+            </a>
           </article>
           <article class="project" data-tilt>
             <div class="project__orbit" aria-hidden="true"><span class="project__orbit-ring"></span></div>
@@ -429,6 +436,9 @@
                 <span class="project__tag">Copium</span>
               </div>
             </div>
+            <a href="https://github.com/J33rry" class="project__link js-cursor-snap" target="_blank" rel="noopener" aria-label="GitHub Repository">
+              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+            </a>
           </article>
           <article class="project" data-tilt>
             <div class="project__orbit" aria-hidden="true"><span class="project__orbit-ring"></span></div>
@@ -443,6 +453,9 @@
                 <span class="project__tag">"It Works Locally"</span>
               </div>
             </div>
+            <a href="https://github.com/J33rry" class="project__link js-cursor-snap" target="_blank" rel="noopener" aria-label="GitHub Repository">
+              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+            </a>
           </article>
           <article class="project" data-tilt>
             <div class="project__orbit" aria-hidden="true"><span class="project__orbit-ring"></span></div>
@@ -457,7 +470,13 @@
                 <span class="project__tag">Forgot My Own</span>
               </div>
             </div>
+            <a href="https://github.com/J33rry" class="project__link js-cursor-snap" target="_blank" rel="noopener" aria-label="GitHub Repository">
+              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+            </a>
           </article>
+        </div>
+        <div class="float-3d float-3d--keyboard" data-parallax-speed="0.25" data-parallax-3d>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="4" width="20" height="16" rx="2" ry="2"/><path d="M6 8h.01"/><path d="M10 8h.01"/><path d="M14 8h.01"/><path d="M18 8h.01"/><path d="M8 12h.01"/><path d="M12 12h.01"/><path d="M16 12h.01"/><path d="M7 16h10"/></svg>
         </div>
       </section>
 
@@ -488,6 +507,9 @@
               <p class="experience__desc">Organised a hackathon. My main contribution was ordering food and making sure the WiFi didn't die. I put "Executive" on my resume and nobody has questioned it yet. The 200+ participants had no idea who I was.</p>
             </div>
           </div>
+        </div>
+        <div class="float-3d float-3d--earphones" data-parallax-speed="-0.2" data-parallax-3d>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 18v-6a9 9 0 0 1 18 0v6"/><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"/></svg>
         </div>
       </section>
 
@@ -561,13 +583,13 @@
   </main>
 
   <!-- ===== REVEAL BUTTON ===== -->
-  <button class="reveal-btn" id="js-btn_clipPath" aria-label="Hold to reveal the truth">
+  <button class="reveal-btn js-cursor-snap" id="js-btn_clipPath" aria-label="Hold to reveal the truth">
     <svg viewBox="0 0 100 100" class="reveal-btn__svg">
       <defs>
         <path id="circlePath" d="M 50,50 m -37,0 a 37,37 0 1,1 74,0 a 37,37 0 1,1 -74,0"/>
       </defs>
       <text class="reveal-btn__text-el">
-        <textPath href="#circlePath">HOLD TO REVEAL THE TRUTH • HOLD TO REVEAL THE TRUTH •</textPath>
+        <textPath href="#circlePath">HOLD TO REVEAL • CTRL+SHIFT • HOLD TO REVEAL • CTRL+SHIFT •</textPath>
       </text>
     </svg>
     <span class="reveal-btn__icon">◉</span>
