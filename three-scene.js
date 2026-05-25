@@ -3,7 +3,7 @@
    3D wireframe planets + particle field
    ============================================================ */
 
-import * as THREE from 'three';
+import * as THREE from 'https://unpkg.com/three@0.160.0/build/three.module.js';
 
 (function () {
   const canvas = document.getElementById('three-canvas');
@@ -43,7 +43,8 @@ import * as THREE from 'three';
     opacity: 0.12,
   });
   const planet1 = new THREE.Mesh(geo1, mat1);
-  planet1.position.set(5, 1.5, -4);
+  const planet1Base = new THREE.Vector3(5, 1.5, -4);
+  planet1.position.copy(planet1Base);
   scene.add(planet1);
 
   // ── Wireframe Planet 2 (smaller, left side) ───────────
@@ -55,7 +56,8 @@ import * as THREE from 'three';
     opacity: 0.07,
   });
   const planet2 = new THREE.Mesh(geo2, mat2);
-  planet2.position.set(-6, -3, -7);
+  const planet2Base = new THREE.Vector3(-6, -3, -7);
+  planet2.position.copy(planet2Base);
   scene.add(planet2);
 
   // ── Wireframe Ring (around planet 1) ──────────────────
@@ -114,12 +116,35 @@ import * as THREE from 'three';
 
   // ── Smooth camera targets ─────────────────────────────
   let camTargetX = 0, camTargetY = 0;
+  let smoothScrollProgress = 0;
 
   // ── Animation Loop ────────────────────────────────────
   function animate() {
     requestAnimationFrame(animate);
 
     const time = performance.now() * 0.001;
+
+    // Smoother scroll interpolation
+    smoothScrollProgress += (scrollProgress - smoothScrollProgress) * 0.05;
+
+    // Move planets chaotically based on scroll (lower frequency, wider sweeps)
+    const scrollFactor = smoothScrollProgress * 8;
+    
+    const target1X = planet1Base.x + Math.sin(scrollFactor) * 4;
+    const target1Y = planet1Base.y + Math.cos(scrollFactor * 1.2) * 5;
+    const target1Z = planet1Base.z + Math.sin(scrollFactor * 0.8) * 6;
+
+    planet1.position.x += (target1X - planet1.position.x) * 0.05;
+    planet1.position.y += (target1Y - planet1.position.y) * 0.05;
+    planet1.position.z += (target1Z - planet1.position.z) * 0.05;
+
+    const target2X = planet2Base.x + Math.cos(scrollFactor * 0.9) * 5;
+    const target2Y = planet2Base.y + Math.sin(scrollFactor * 1.5) * 6;
+    const target2Z = planet2Base.z + Math.cos(scrollFactor * 1.1) * 4;
+
+    planet2.position.x += (target2X - planet2.position.x) * 0.05;
+    planet2.position.y += (target2Y - planet2.position.y) * 0.05;
+    planet2.position.z += (target2Z - planet2.position.z) * 0.05;
 
     // Rotate planets
     planet1.rotation.x = time * 0.08;
@@ -128,8 +153,9 @@ import * as THREE from 'three';
     planet2.rotation.x = -time * 0.1;
     planet2.rotation.y = time * 0.06;
 
-    // Rotate ring
+    // Rotate & Move ring to follow planet1
     ring.rotation.z = Math.PI * 0.1 + time * 0.03;
+    ring.position.copy(planet1.position);
 
     // Drift particles
     particles.rotation.y = time * 0.015;
