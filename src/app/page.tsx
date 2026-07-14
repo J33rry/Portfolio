@@ -6,7 +6,7 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useGSAP } from "@gsap/react";
 import Lenis from "lenis";
 import SplitType from "split-type";
-import ThreeCanvas from "@/components/ThreeCanvas";
+import FluidReveal, { type FluidRevealHandle } from "@/components/FluidReveal";
 import Navbar from "@/components/Navbar";
 import Hero from "@/components/Hero";
 import About from "@/components/About";
@@ -22,41 +22,22 @@ if (typeof window !== "undefined") {
 }
 
 export default function Home() {
-  const cursorRef = useRef<HTMLDivElement>(null);
   const maskerRef = useRef<HTMLDivElement>(null);
   const revealBtnRef = useRef<HTMLButtonElement>(null);
   const pageRef = useRef<HTMLDivElement>(null);
+  const fluidRef = useRef<FluidRevealHandle>(null);
 
   useGSAP(
     () => {
       // ── State variables in closure ───────────────────────
-      let mouseX = -200, mouseY = -200;
-      let cursorX = -200, cursorY = -200;
       let isRevealing = false;
-      const maskSize = { inner: 50, outer: 70 };
-      const targetMask = { inner: 50, outer: 70 };
-
-      // Mask sizes for cursor states
-      const MASK = {
-        default: { inner: 50, outer: 70 },
-        extend: { inner: 140, outer: 170 },
-        contract: { inner: 6, outer: 12 },
-      };
-
-      let snapTarget: HTMLElement | null = null;
-      let isSnapping = false;
 
       // ── Mobile / Touch Detection ────────────────────────
       const isTouchDevice =
         "ontouchstart" in window || navigator.maxTouchPoints > 0;
 
-      const masker = maskerRef.current;
-      const cursor = cursorRef.current;
-
-      if (isTouchDevice && masker) {
+      if (isTouchDevice && maskerRef.current) {
         document.body.classList.add("is-touch");
-        masker.style.setProperty("--mask-inner", "0px");
-        masker.style.setProperty("--mask-outer", "0px");
       }
 
       // ── Lenis Smooth Scroll ─────────────────────────────
@@ -82,187 +63,19 @@ export default function Home() {
         console.warn("Lenis init failed:", e);
       }
 
-      // ── Custom Cursor + Mask Position Ticker ────────────
-      const cursorTicker = () => {
-        if (!cursor || !masker) return;
-
-        // Lerp cursor position
-        if (snapTarget) {
-          const rect = snapTarget.getBoundingClientRect();
-          const centerX = rect.left + rect.width / 2;
-          const centerY = rect.top + rect.height / 2;
-
-          // Add a slight magnetic pull towards the mouse
-          const magneticX = centerX + (mouseX - centerX) * 0.1;
-          const magneticY = centerY + (mouseY - centerY) * 0.1;
-
-          cursorX += (magneticX - cursorX) * 0.3;
-          cursorY += (magneticY - cursorY) * 0.3;
-        } else {
-          cursorX += (mouseX - cursorX) * 0.22;
-          cursorY += (mouseY - cursorY) * 0.22;
-        }
-
-        // Update cursor element
-        cursor.style.left = cursorX + "px";
-        cursor.style.top = cursorY + "px";
-
-        // Update mask position (convert viewport → page coords)
-        const pageY = cursorY + window.scrollY;
-        masker.style.setProperty("--x", cursorX + "px");
-        masker.style.setProperty("--y", pageY + "px");
-
-        // Lerp mask size (for smooth transitions)
-        if (!isRevealing) {
-          maskSize.inner += (targetMask.inner - maskSize.inner) * 0.15;
-          maskSize.outer += (targetMask.outer - maskSize.outer) * 0.15;
-          masker.style.setProperty("--mask-inner", maskSize.inner + "px");
-          masker.style.setProperty("--mask-outer", maskSize.outer + "px");
-        }
-      };
-
-      const handleMouseMove = (e: MouseEvent) => {
-        mouseX = e.clientX;
-        mouseY = e.clientY;
-      };
-
-      if (!isTouchDevice) {
-        document.addEventListener("mousemove", handleMouseMove);
-        gsap.ticker.add(cursorTicker);
-      }
-
-      // ── Cursor States (extend / contract / snap) ─────────
-      if (!isTouchDevice && cursor) {
-        // Elements that extend the cursor (large text / headings)
-        document
-          .querySelectorAll(".layer__dark .js-cursor-extend")
-          .forEach((el) => {
-            el.addEventListener("mouseenter", () => {
-              cursor.classList.add("is-extended");
-              cursor.classList.remove("is-contracted");
-              targetMask.inner = MASK.extend.inner;
-              targetMask.outer = MASK.extend.outer;
-            });
-            el.addEventListener("mouseleave", () => {
-              cursor.classList.remove("is-extended");
-              targetMask.inner = MASK.default.inner;
-              targetMask.outer = MASK.default.outer;
-            });
-          });
-
-        // Elements that contract the cursor (links, buttons)
-        document
-          .querySelectorAll(".layer__dark .js-cursor-contract")
-          .forEach((el) => {
-            el.addEventListener("mouseenter", () => {
-              cursor.classList.add("is-contracted");
-              cursor.classList.remove("is-extended");
-              targetMask.inner = MASK.contract.inner;
-              targetMask.outer = MASK.contract.outer;
-            });
-            el.addEventListener("mouseleave", () => {
-              cursor.classList.remove("is-contracted");
-              targetMask.inner = MASK.default.inner;
-              targetMask.outer = MASK.default.outer;
-            });
-          });
-
-        // Elements that snap the cursor (buttons, specific links)
-        document
-          .querySelectorAll(".layer__dark .js-cursor-snap")
-          .forEach((el) => {
-            el.addEventListener("mouseenter", () => {
-              isSnapping = true;
-              snapTarget = el as HTMLElement;
-              cursor.classList.add("is-snapped");
-
-              const rect = el.getBoundingClientRect();
-              const style = window.getComputedStyle(el);
-              cursor.style.setProperty("--snap-w", rect.width + "px");
-              cursor.style.setProperty("--snap-h", rect.height + "px");
-              cursor.style.setProperty("--snap-r", style.borderRadius);
-
-              gsap.killTweensOf(el);
-            });
-
-            el.addEventListener("mousemove", (e) => {
-              if (!isSnapping) return;
-              const ev = e as MouseEvent;
-              const rect = el.getBoundingClientRect();
-              const centerX = rect.left + rect.width / 2;
-              const centerY = rect.top + rect.height / 2;
-              const distX = ev.clientX - centerX;
-              const distY = ev.clientY - centerY;
-
-              gsap.to(el, {
-                x: distX * 0.3,
-                y: distY * 0.3,
-                duration: 0.4,
-                ease: "power2.out",
-              });
-            });
-
-            el.addEventListener("mouseleave", () => {
-              isSnapping = false;
-              snapTarget = null;
-              cursor.classList.remove("is-snapped");
-
-              gsap.to(el, {
-                x: 0,
-                y: 0,
-                duration: 0.6,
-                ease: "elastic.out(1, 0.4)",
-              });
-            });
-          });
-      }
-
-      // ── Reveal Button ────────────────────────────────────
+      // ── Reveal Button (fluid splat injection) ─────────────
       const revealBtn = revealBtnRef.current;
-      const expandSize = Math.max(window.innerWidth, window.innerHeight) * 1.5;
-      let revealTween: gsap.core.Tween | null = null;
 
       const startReveal = (cx?: number, cy?: number) => {
         isRevealing = true;
-        if (!masker) return;
-
         const centerX = cx !== undefined ? cx : window.innerWidth / 2;
         const centerY = cy !== undefined ? cy : window.innerHeight / 2;
-        const pageCenterY = centerY + window.scrollY;
-
-        masker.style.setProperty("--x", centerX + "px");
-        masker.style.setProperty("--y", pageCenterY + "px");
-
-        if (revealTween) revealTween.kill();
-        revealTween = gsap.to(maskSize, {
-          inner: expandSize,
-          outer: expandSize,
-          duration: 0.9,
-          ease: "power3.out",
-          onUpdate: () => {
-            masker.style.setProperty("--mask-inner", maskSize.inner + "px");
-            masker.style.setProperty("--mask-outer", maskSize.outer + "px");
-          },
-        });
+        fluidRef.current?.startContinuousSplat(centerX, centerY);
       };
 
       const stopReveal = () => {
-        if (revealTween) revealTween.kill();
-        revealTween = gsap.to(maskSize, {
-          inner: MASK.default.inner,
-          outer: MASK.default.outer,
-          duration: 0.5,
-          ease: "power2.in",
-          onUpdate: () => {
-            masker?.style.setProperty("--mask-inner", maskSize.inner + "px");
-            masker?.style.setProperty("--mask-outer", maskSize.outer + "px");
-          },
-          onComplete: () => {
-            isRevealing = false;
-            targetMask.inner = MASK.default.inner;
-            targetMask.outer = MASK.default.outer;
-          },
-        });
+        isRevealing = false;
+        fluidRef.current?.stopContinuousSplat();
       };
 
       if (revealBtn) {
@@ -292,21 +105,6 @@ export default function Home() {
           passive: false,
         });
         revealBtn.addEventListener("touchcancel", stopReveal);
-
-        if (!isTouchDevice && cursor) {
-          revealBtn.addEventListener("mouseenter", () => {
-            cursor.classList.add("is-extended");
-            targetMask.inner = 60;
-            targetMask.outer = 80;
-          });
-          revealBtn.addEventListener("mouseleave", () => {
-            if (!isRevealing) {
-              cursor.classList.remove("is-extended");
-              targetMask.inner = MASK.default.inner;
-              targetMask.outer = MASK.default.outer;
-            }
-          });
-        }
       }
 
       // Keyboard Shortcut (Hold Ctrl + Shift)
@@ -565,10 +363,6 @@ export default function Home() {
 
       // ── Clean Up ─────────────────────────────────────────
       return () => {
-        if (!isTouchDevice) {
-          document.removeEventListener("mousemove", handleMouseMove);
-          gsap.ticker.remove(cursorTicker);
-        }
         document.removeEventListener("keydown", handleKeyDown);
         document.removeEventListener("keyup", handleKeyUp);
         window.removeEventListener("resize", syncLayerHeights);
@@ -584,11 +378,8 @@ export default function Home() {
 
   return (
     <>
-      {/* ===== CUSTOM CURSOR ===== */}
-      <div className="cursor" id="cursor" ref={cursorRef} />
-
       {/* ===== THREE.JS CANVAS ===== */}
-      <ThreeCanvas />
+      <FluidReveal ref={fluidRef} maskerRef={maskerRef} />
 
       {/* ===== PAGE WRAPPER ===== */}
       <main className="page" id="page" ref={pageRef}>

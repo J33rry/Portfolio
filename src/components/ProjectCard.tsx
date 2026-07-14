@@ -40,7 +40,7 @@ export default function ProjectCard({
         </div>
         <a
           href={github}
-          className="project__link js-cursor-snap"
+          className="project__link"
           target="_blank"
           rel="noopener noreferrer"
           aria-label="GitHub Repository"
@@ -60,7 +60,7 @@ export default function ProjectCard({
       </div>
       <span className="project__number">{number}</span>
       <div className="project__info">
-        <h3 className="project__title js-cursor-extend">{title}</h3>
+        <h3 className="project__title">{title}</h3>
         <span className="project__type">{type}</span>
         <p className="project__desc">{desc}</p>
         <div className="project__tags">
@@ -73,7 +73,7 @@ export default function ProjectCard({
       </div>
       <a
         href={github}
-        className="project__link js-cursor-snap"
+        className="project__link"
         target="_blank"
         rel="noopener noreferrer"
         aria-label="GitHub Repository"

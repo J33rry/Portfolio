@@ -59,12 +59,12 @@ export default function Navbar({ layer }: NavbarProps) {
 
   return (
     <nav className="nav" id="nav">
-      <a href="#" className="nav__logo js-cursor-snap" onClick={handleLinkClick}>
+      <a href="#" className="nav__logo" onClick={handleLinkClick}>
         ANIL.DEV
       </a>
 
       <button 
-        className="nav__toggle js-cursor-snap" 
+        className="nav__toggle" 
         onClick={handleToggle}
         aria-label="Toggle menu"
         aria-expanded={isOpen}
@@ -74,16 +74,16 @@ export default function Navbar({ layer }: NavbarProps) {
       </button>
 
       <div className="nav__links">
-        <a href="#about" className="nav__link js-cursor-snap" onClick={handleLinkClick}>
+        <a href="#about" className="nav__link" onClick={handleLinkClick}>
           About
         </a>
-        <a href="#work" className="nav__link js-cursor-snap" onClick={handleLinkClick}>
+        <a href="#work" className="nav__link" onClick={handleLinkClick}>
           Work
         </a>
-        <a href="#experience" className="nav__link js-cursor-snap" onClick={handleLinkClick}>
+        <a href="#experience" className="nav__link" onClick={handleLinkClick}>
           Experience
         </a>
-        <a href="#contact" className="nav__link js-cursor-snap" onClick={handleLinkClick}>
+        <a href="#contact" className="nav__link" onClick={handleLinkClick}>
           Contact
         </a>
       </div>

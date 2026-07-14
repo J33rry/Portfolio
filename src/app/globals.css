@@ -61,18 +61,7 @@
    ANIL.DEV PORTFOLIO — STYLES (Migrated to Next.js + Tailwind v4)
    ============================================================ */
 
-/* ── @property Registrations ─────────────────────────────── */
-@property --mask-inner {
-    syntax: "<length>";
-    inherits: true;
-    initial-value: 0px;
-}
-
-@property --mask-outer {
-    syntax: "<length>";
-    inherits: true;
-    initial-value: 0px;
-}
+/* ── (removed: @property --mask-inner/outer — now fluid-driven) ── */
 
 /* ── Reset & Base overrides ──────────────────────────────── */
 html {
@@ -98,10 +87,6 @@ body {
     overflow-x: hidden;
     background: #090909;
     color: #eee7d8;
-}
-
-body:not(.is-touch) {
-    cursor: none;
 }
 
 a {
@@ -228,92 +213,17 @@ h3 {
     pointer-events: none;
     background: var(--bg);
 
-    /* Mask via radial-gradient with soft edge */
-    -webkit-mask-image: radial-gradient(
-        circle at var(--x, -200px) var(--y, -200px),
-        black var(--mask-inner),
-        transparent var(--mask-outer)
-    );
-    mask-image: radial-gradient(
-        circle at var(--x, -200px) var(--y, -200px),
-        black var(--mask-inner),
-        transparent var(--mask-outer)
-    );
+    /* Fluid simulation mask — initial state: fully hidden.
+       mask-image and mask-position are updated dynamically
+       by the FluidReveal component each frame. */
+    -webkit-mask-image: linear-gradient(transparent, transparent);
+    mask-image: linear-gradient(transparent, transparent);
+    -webkit-mask-size: 100vw 100vh;
+    mask-size: 100vw 100vh;
     -webkit-mask-repeat: no-repeat;
     mask-repeat: no-repeat;
-
-    transition:
-        --mask-inner 0.3s cubic-bezier(0.25, 1, 0.5, 1),
-        --mask-outer 0.3s cubic-bezier(0.25, 1, 0.5, 1);
 }
 
-/* ── Custom Cursor ───────────────────────────────────────── */
-.cursor {
-    position: fixed;
-    width: 60px;
-    height: 60px;
-    border: 1.5px solid rgba(232, 224, 208, 0.5);
-    border-radius: 50%;
-    pointer-events: none;
-    z-index: 9999;
-    transform: translate(-50%, -50%);
-    transition:
-        width 0.3s cubic-bezier(0.25, 1, 0.5, 1),
-        height 0.3s cubic-bezier(0.25, 1, 0.5, 1),
-        border-color 0.3s ease,
-        background-color 0.3s ease;
-    mix-blend-mode: difference;
-    will-change: transform;
-}
-
-.cursor.is-extended {
-    width: 160px;
-    height: 160px;
-    border-color: rgba(232, 224, 208, 0.2);
-    background: rgba(232, 224, 208, 0.03);
-}
-
-.cursor.is-contracted {
-    width: 12px;
-    height: 12px;
-    border-color: rgba(232, 224, 208, 0.9);
-    background: rgba(232, 224, 208, 0.5);
-}
-
-.cursor.is-snapped {
-    width: var(--snap-w, 60px) !important;
-    height: var(--snap-h, 60px) !important;
-    border-radius: var(--snap-r, 50%) !important;
-    border-color: transparent !important;
-    background: rgba(217, 49, 49, 0.12) !important;
-    mix-blend-mode: normal !important;
-}
-
-/* Make text inside snapped elements pop */
-.js-cursor-snap:hover {
-    color: #ffffff !important;
-}
-.js-cursor-snap:hover * {
-    fill: #ffffff;
-    color: #ffffff;
-}
-
-/* Also make the underlying red-layer text pop when hovered */
-.layer__dark:has(.js-cursor-snap:hover) ~ .layer__red .nav__logo,
-.layer__dark:has(.js-cursor-snap:hover) ~ .layer__red .nav__link,
-.layer__dark:has(.js-cursor-snap:hover) ~ .layer__red .project__link,
-.layer__dark:has(.js-cursor-snap:hover) ~ .layer__red .contact__email,
-.layer__dark:has(.js-cursor-snap:hover) ~ .layer__red .contact__link {
-    color: #ffffff !important;
-    fill: #ffffff !important;
-    transition:
-        color 0s,
-        fill 0s; /* instant change */
-}
-
-.is-touch .cursor {
-    display: none !important;
-}
 
 /* ── Navigation ──────────────────────────────────────────── */
 .nav {
@@ -1588,11 +1498,11 @@ h3 {
     z-index: 1;
 }
 
-.js-cursor-snap:hover .reveal-btn__text-el {
+.reveal-btn:hover .reveal-btn__text-el {
     fill: #ffffff !important;
 }
 
-.js-cursor-snap:hover .reveal-btn__icon {
+.reveal-btn:hover .reveal-btn__icon {
     color: #ffffff !important;
 }
 
@@ -2046,10 +1956,6 @@ h3 {
 /* ── Reduced Motion ───────────────────────────────────────── */
 @media (prefers-reduced-motion: reduce) {
     .layer__red {
-        transition: none !important;
-    }
-
-    .cursor {
         transition: none !important;
     }
 
