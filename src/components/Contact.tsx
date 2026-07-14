@@ -37,7 +37,7 @@ export default function Contact({ layer }: ContactProps) {
       <div className="contact__body">
         <a
           href="mailto:anilm7017@gmail.com"
-          className="contact__email js-anim--lines--sim"
+          className="contact__email js-cursor-snap js-anim--lines--sim"
         >
           anilm7017@gmail.com
         </a>
@@ -46,7 +46,7 @@ export default function Contact({ layer }: ContactProps) {
             href="https://github.com/J33rry"
             target="_blank"
             rel="noopener noreferrer"
-            className="contact__link"
+            className="contact__link js-cursor-snap"
           >
             GitHub
           </a>
@@ -54,7 +54,7 @@ export default function Contact({ layer }: ContactProps) {
             href="https://linkedin.com/in/j33rry"
             target="_blank"
             rel="noopener noreferrer"
-            className="contact__link"
+            className="contact__link js-cursor-snap"
           >
             LinkedIn
           </a>
@@ -62,7 +62,7 @@ export default function Contact({ layer }: ContactProps) {
             href="/Anil_SDE_Intern.pdf"
             target="_blank"
             rel="noopener noreferrer"
-            className="contact__link"
+            className="contact__link js-cursor-snap"
           >
             Resume ↗
           </a>
