@@ -131,7 +131,7 @@ export default function Hero({ layer }: HeroProps) {
                 <circle cx="200" cy="250" r="1.5" fill="var(--accent)" opacity="0.25" className="hero__geo-dot" />
               </svg>
               <Image
-                src="/cat.png"
+                src="/hidden.png"
                 alt="Cat — the real developer"
                 width={480}
                 height={580}
@@ -274,7 +274,7 @@ export default function Hero({ layer }: HeroProps) {
               <circle cx="200" cy="250" r="1.5" fill="var(--accent)" opacity="0.2" className="hero__geo-dot" />
             </svg>
             <Image
-              src="/Character.png"
+              src="/main.png"
               alt="Anil Kumar Meena — low-poly portrait"
               width={480}
               height={580}

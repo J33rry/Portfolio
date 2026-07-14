@@ -139,17 +139,17 @@ button {
 }
 
 .layer__red {
-    --bg: #c62828;
-    --text: #0d0d0d;
-    --text-subtle: rgba(13, 13, 13, 0.4);
-    --accent: #ff1744;
-    --accent-red: #ff1744;
-    --accent-red-glow: rgba(255, 23, 68, 0.2);
-    --border: rgba(13, 13, 13, 0.15);
-    --tag-bg: rgba(13, 13, 13, 0.1);
-    --tag-text: #0d0d0d;
-    --glass-bg: rgba(13, 13, 13, 0.08);
-    --glass-border: rgba(13, 13, 13, 0.12);
+    --bg: #220303;
+    --text: #ffeded;
+    --text-subtle: #b89898;
+    --accent: #ff3355;
+    --accent-red: #ff3355;
+    --accent-red-glow: rgba(255, 51, 85, 0.25);
+    --border: rgba(255, 237, 237, 0.15);
+    --tag-bg: rgba(255, 51, 85, 0.12);
+    --tag-text: #ff6680;
+    --glass-bg: rgba(255, 237, 237, 0.04);
+    --glass-border: rgba(255, 237, 237, 0.08);
 }
 
 /* ── Typography ──────────────────────────────────────────── */
@@ -228,23 +228,14 @@ h3 {
     pointer-events: none;
     background: var(--bg);
 
-    /* Mask via radial-gradient with soft edge */
-    -webkit-mask-image: radial-gradient(
-        circle at var(--x, -200px) var(--y, -200px),
-        black var(--mask-inner),
-        transparent var(--mask-outer)
-    );
-    mask-image: radial-gradient(
-        circle at var(--x, -200px) var(--y, -200px),
-        black var(--mask-inner),
-        transparent var(--mask-outer)
-    );
+    -webkit-mask-size: 100% 100%;
+    mask-size: 100% 100%;
     -webkit-mask-repeat: no-repeat;
     mask-repeat: no-repeat;
+}
 
-    transition:
-        --mask-inner 0.3s cubic-bezier(0.25, 1, 0.5, 1),
-        --mask-outer 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+.layer__red > section {
+    overflow: hidden;
 }
 
 /* ── Custom Cursor ───────────────────────────────────────── */
@@ -332,8 +323,8 @@ h3 {
 }
 
 .layer__red .nav {
-    background: rgba(198, 40, 40, 0.85);
-    border-bottom: 1px solid rgba(13, 13, 13, 0.1);
+    background: rgba(34, 3, 3, 0.85);
+    border-bottom: 1px solid rgba(255, 237, 237, 0.1);
 }
 
 /* Hamburger Toggle Button */
@@ -1944,8 +1935,8 @@ h3 {
 
     /* Red layer overlay styles */
     .layer__red .nav__links {
-        background: rgba(198, 40, 40, 0.98);
-        border-left: 1px solid rgba(13, 13, 13, 0.1);
+        background: rgba(34, 3, 3, 0.98);
+        border-left: 1px solid rgba(255, 237, 237, 0.1);
     }
 
     /* Slides in when nav-open class is active on body */

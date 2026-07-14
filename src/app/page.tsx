@@ -14,7 +14,12 @@ import Experience from "@/components/Experience";
 import Stats from "@/components/Stats";
 import Testimonials from "@/components/Testimonials";
 import Contact from "@/components/Contact";
-import Footer from "@/components/Footer";
+import Footer from "@/components/Footer";import * as THREE from "three";
+import {
+    vertexShader,
+    aspectCorrectedFluidFragmentShader,
+    aspectCorrectedMaskFragmentShader,
+} from "./example/shader";
 
 if (typeof window !== "undefined") {
     gsap.registerPlugin(ScrollTrigger);
@@ -34,6 +39,7 @@ export default function Home() {
             let cursorX = -200,
                 cursorY = -200;
             let isRevealing = false;
+            const revealState = { progress: 0.0 };
             const maskSize = { inner: 50, outer: 70 };
             const targetMask = { inner: 50, outer: 70 };
 
@@ -56,8 +62,6 @@ export default function Home() {
 
             if (isTouchDevice && masker) {
                 document.body.classList.add("is-touch");
-                masker.style.setProperty("--mask-inner", "0px");
-                masker.style.setProperty("--mask-outer", "0px");
             }
 
             // ── Lenis Smooth Scroll ─────────────────────────────
@@ -82,6 +86,137 @@ export default function Home() {
             } catch (e) {
                 console.warn("Lenis init failed:", e);
             }
+
+            // ── WebGL Fluid Mask Simulation Setup ────────────────
+            const decay = 0.97;
+            const maskResolution = 400; // longest side of the offscreen mask canvas, in px
+
+            const maskCanvas = document.createElement("canvas");
+            const renderer = new THREE.WebGLRenderer({
+                canvas: maskCanvas,
+                antialias: false,
+                alpha: true,
+                preserveDrawingBuffer: true,
+            });
+            renderer.setPixelRatio(1);
+
+            const getPageSize = () => {
+                const docElement = document.documentElement;
+                const body = document.body;
+                return {
+                    width: Math.max(
+                        body.scrollWidth,
+                        docElement.scrollWidth,
+                        body.offsetWidth,
+                        docElement.offsetWidth,
+                        body.clientWidth,
+                        docElement.clientWidth
+                    ) || 1,
+                    height: Math.max(
+                        body.scrollHeight,
+                        docElement.scrollHeight,
+                        body.offsetHeight,
+                        docElement.offsetHeight,
+                        body.clientHeight,
+                        docElement.clientHeight
+                    ) || 1,
+                };
+            };
+
+            function computeMaskSize() {
+                const { width, height } = getPageSize();
+                const scale = maskResolution / Math.max(width, height);
+                return {
+                    w: Math.max(1, Math.round(width * scale)),
+                    h: Math.max(1, Math.round(height * scale)),
+                    pageW: width,
+                    pageH: height,
+                };
+            }
+
+            let { w: maskW, h: maskH, pageW, pageH } = computeMaskSize();
+            maskCanvas.width = maskW;
+            maskCanvas.height = maskH;
+            renderer.setSize(maskW, maskH, false);
+
+            const scene = new THREE.Scene();
+            const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
+
+            const webglMouse = new THREE.Vector2(0.5, 0.5);
+            const webglPrevMouse = new THREE.Vector2(0.5, 0.5);
+            let webglIsMoving = false;
+            let webglLastMoveTime = 0;
+
+            const pingPongTargets = [
+                new THREE.WebGLRenderTarget(maskW, maskH, {
+                    minFilter: THREE.LinearFilter,
+                    magFilter: THREE.LinearFilter,
+                    format: THREE.RGBAFormat,
+                    type: THREE.FloatType,
+                }),
+                new THREE.WebGLRenderTarget(maskW, maskH, {
+                    minFilter: THREE.LinearFilter,
+                    magFilter: THREE.LinearFilter,
+                    format: THREE.RGBAFormat,
+                    type: THREE.FloatType,
+                }),
+            ];
+            let currentTarget = 0;
+
+            const trailsMaterial = new THREE.ShaderMaterial({
+                uniforms: {
+                    uPrevTrails: { value: null },
+                    uMouse: { value: webglMouse },
+                    uPrevMouse: { value: webglPrevMouse },
+                    uResolution: { value: new THREE.Vector2(maskW, maskH) },
+                    uRadius: { value: 20.0 }, // radius in canvas pixels
+                    uDecay: { value: decay },
+                    uIsMoving: { value: false },
+                },
+                vertexShader,
+                fragmentShader: aspectCorrectedFluidFragmentShader,
+            });
+
+            const maskMaterial = new THREE.ShaderMaterial({
+                uniforms: {
+                    uFluid: { value: null },
+                    uDpr: { value: typeof window !== "undefined" ? window.devicePixelRatio || 1 : 1 },
+                    uRevealProgress: { value: 0.0 },
+                    uRevealCenter: { value: new THREE.Vector2(0.5, 0.5) },
+                    uResolution: { value: new THREE.Vector2(maskW, maskH) },
+                },
+                vertexShader,
+                fragmentShader: aspectCorrectedMaskFragmentShader,
+                transparent: true,
+            });
+
+            const planeGeometry = new THREE.PlaneGeometry(2, 2);
+            const maskMesh = new THREE.Mesh(planeGeometry, maskMaterial);
+            scene.add(maskMesh);
+
+            const simMesh = new THREE.Mesh(planeGeometry, trailsMaterial);
+            const simScene = new THREE.Scene();
+            simScene.add(simMesh);
+
+            renderer.setRenderTarget(pingPongTargets[0]);
+            renderer.clear();
+            renderer.setRenderTarget(pingPongTargets[1]);
+            renderer.clear();
+            renderer.setRenderTarget(null);
+
+            const resizeWebGL = () => {
+                const next = computeMaskSize();
+                maskW = next.w;
+                maskH = next.h;
+                pageW = next.pageW;
+                pageH = next.pageH;
+                maskCanvas.width = maskW;
+                maskCanvas.height = maskH;
+                renderer.setSize(maskW, maskH, false);
+                trailsMaterial.uniforms.uResolution.value.set(maskW, maskH);
+                maskMaterial.uniforms.uResolution.value.set(maskW, maskH);
+                pingPongTargets.forEach((t) => t.setSize(maskW, maskH));
+            };
 
             // ── Custom Cursor + Mask Position Ticker ────────────
             const cursorTicker = () => {
@@ -108,26 +243,61 @@ export default function Home() {
                 cursor.style.left = cursorX + "px";
                 cursor.style.top = cursorY + "px";
 
-                // Update mask position (convert viewport → page coords)
-                const pageY = cursorY + window.scrollY;
-                masker.style.setProperty("--x", cursorX + "px");
-                masker.style.setProperty("--y", pageY + "px");
-
                 // Lerp mask size (for smooth transitions)
                 if (!isRevealing) {
                     maskSize.inner +=
                         (targetMask.inner - maskSize.inner) * 0.15;
                     maskSize.outer +=
                         (targetMask.outer - maskSize.outer) * 0.15;
-                    masker.style.setProperty(
-                        "--mask-inner",
-                        maskSize.inner + "px",
-                    );
-                    masker.style.setProperty(
-                        "--mask-outer",
-                        maskSize.outer + "px",
-                    );
                 }
+
+                // Check for dynamic page size changes (e.g. font loaded or layout shift)
+                const { width: pW, height: pH } = getPageSize();
+                if (Math.abs(pH - pageH) > 5 || Math.abs(pW - pageW) > 5) {
+                    resizeWebGL();
+                }
+
+                const pageCursorX = cursorX;
+                const pageCursorY = cursorY + window.scrollY;
+
+                webglPrevMouse.copy(webglMouse);
+                webglMouse.x = pageCursorX / pageW;
+                webglMouse.y = 1.0 - (pageCursorY / pageH);
+
+                const deltaMove = webglMouse.distanceToSquared(webglPrevMouse);
+                if (deltaMove > 0.000001) {
+                    webglIsMoving = true;
+                    webglLastMoveTime = performance.now();
+                } else if (performance.now() - webglLastMoveTime > 50) {
+                    webglIsMoving = false;
+                }
+
+                // Run WebGL fluid simulation step
+                const scale = maskH / pageH;
+                const prevTarget = pingPongTargets[currentTarget];
+                currentTarget = (currentTarget + 1) % 2;
+                const currentRenderTarget = pingPongTargets[currentTarget];
+
+                trailsMaterial.uniforms.uPrevTrails.value = prevTarget.texture;
+                trailsMaterial.uniforms.uMouse.value.copy(webglMouse);
+                trailsMaterial.uniforms.uPrevMouse.value.copy(webglPrevMouse);
+                trailsMaterial.uniforms.uIsMoving.value = webglIsMoving;
+                trailsMaterial.uniforms.uRadius.value = maskSize.outer * scale;
+
+                renderer.setRenderTarget(currentRenderTarget);
+                renderer.render(simScene, camera);
+
+                maskMaterial.uniforms.uFluid.value = currentRenderTarget.texture;
+                maskMaterial.uniforms.uRevealProgress.value = revealState.progress;
+
+                renderer.setRenderTarget(null);
+                renderer.render(scene, camera);
+
+                // Hand the freshly-rendered frame to CSS as the top layer's mask
+                const dataUrl = maskCanvas.toDataURL("image/png");
+                const maskValue = `url(${dataUrl})`;
+                masker.style.maskImage = maskValue;
+                masker.style.webkitMaskImage = maskValue;
             };
 
             const handleMouseMove = (e: MouseEvent) => {
@@ -135,10 +305,16 @@ export default function Home() {
                 mouseY = e.clientY;
             };
 
-            if (!isTouchDevice) {
-                document.addEventListener("mousemove", handleMouseMove);
-                gsap.ticker.add(cursorTicker);
-            }
+            const handleTouchMove = (e: TouchEvent) => {
+                if (e.touches.length > 0) {
+                    mouseX = e.touches[0].clientX;
+                    mouseY = e.touches[0].clientY;
+                }
+            };
+
+            document.addEventListener("mousemove", handleMouseMove);
+            document.addEventListener("touchmove", handleTouchMove, { passive: true });
+            gsap.ticker.add(cursorTicker);
 
             // ── Cursor States (extend / contract / snap) ─────────
             if (!isTouchDevice && cursor) {
@@ -247,51 +423,38 @@ export default function Home() {
 
                 const centerX = cx !== undefined ? cx : window.innerWidth / 2;
                 const centerY = cy !== undefined ? cy : window.innerHeight / 2;
+
+                const { width: pW, height: pH } = getPageSize();
+                const pageCenterX = centerX;
                 const pageCenterY = centerY + window.scrollY;
 
-                masker.style.setProperty("--x", centerX + "px");
-                masker.style.setProperty("--y", pageCenterY + "px");
+                maskMaterial.uniforms.uRevealCenter.value.set(
+                    pageCenterX / pW,
+                    1.0 - (pageCenterY / pH)
+                );
 
                 if (revealTween) revealTween.kill();
-                revealTween = gsap.to(maskSize, {
-                    inner: expandSize,
-                    outer: expandSize,
+                revealTween = gsap.to(revealState, {
+                    progress: 1.0,
                     duration: 0.9,
                     ease: "power3.out",
                     onUpdate: () => {
-                        masker.style.setProperty(
-                            "--mask-inner",
-                            maskSize.inner + "px",
-                        );
-                        masker.style.setProperty(
-                            "--mask-outer",
-                            maskSize.outer + "px",
-                        );
+                        maskMaterial.uniforms.uRevealProgress.value = revealState.progress;
                     },
                 });
             };
 
             const stopReveal = () => {
                 if (revealTween) revealTween.kill();
-                revealTween = gsap.to(maskSize, {
-                    inner: MASK.default.inner,
-                    outer: MASK.default.outer,
+                revealTween = gsap.to(revealState, {
+                    progress: 0.0,
                     duration: 0.5,
                     ease: "power2.in",
                     onUpdate: () => {
-                        masker?.style.setProperty(
-                            "--mask-inner",
-                            maskSize.inner + "px",
-                        );
-                        masker?.style.setProperty(
-                            "--mask-outer",
-                            maskSize.outer + "px",
-                        );
+                        maskMaterial.uniforms.uRevealProgress.value = revealState.progress;
                     },
                     onComplete: () => {
                         isRevealing = false;
-                        targetMask.inner = MASK.default.inner;
-                        targetMask.outer = MASK.default.outer;
                     },
                 });
             };
@@ -366,46 +529,77 @@ export default function Home() {
             document.addEventListener("keyup", handleKeyUp);
 
             // ── Character Slide-Up Animations ───────────────────
-            const charTargets = document.querySelectorAll(
+            const darkCharTargets = document.querySelectorAll(
                 ".layer__dark .js-anim--chars",
+            );
+            const redCharTargets = document.querySelectorAll(
+                ".layer__red .js-anim--chars",
             );
             const splitInstances: SplitType[] = [];
 
-            charTargets.forEach((el, idx) => {
-                const split = new SplitType(el as HTMLElement, {
+            darkCharTargets.forEach((el, idx) => {
+                const darkSplit = new SplitType(el as HTMLElement, {
                     types: "chars",
                 });
-                splitInstances.push(split);
+                splitInstances.push(darkSplit);
+                gsap.set(darkSplit.chars, { y: "110%" });
 
-                gsap.set(split.chars, { y: "110%" });
+                const redEl = redCharTargets[idx];
+                let redSplit: SplitType | null = null;
+                if (redEl) {
+                    redSplit = new SplitType(redEl as HTMLElement, {
+                        types: "chars",
+                    });
+                    splitInstances.push(redSplit);
+                    gsap.set(redSplit.chars, { y: "110%" });
+                }
 
                 const isHero = el.closest(".hero");
                 if (isHero) {
-                    gsap.to(split.chars, {
+                    gsap.to(darkSplit.chars, {
                         y: "0%",
                         duration: 1,
                         ease: "power4.out",
                         stagger: 0.03,
                         delay: 0.3 + idx * 0.15,
                     });
+                    if (redSplit) {
+                        gsap.to(redSplit.chars, {
+                            y: "0%",
+                            duration: 1,
+                            ease: "power4.out",
+                            stagger: 0.03,
+                            delay: 0.3 + idx * 0.15,
+                        });
+                    }
                 } else {
-                    gsap.to(split.chars, {
-                        y: "0%",
-                        duration: 0.8,
-                        ease: "power3.out",
-                        stagger: 0.02,
-                        scrollTrigger: {
-                            trigger: el,
-                            start: "top 85%",
-                            toggleActions: "play none none none",
-                        },
+                    const targetsToAnim = [
+                        darkSplit.chars,
+                        redSplit ? redSplit.chars : null
+                    ].filter((t): t is HTMLElement[] => t !== null);
+
+                    targetsToAnim.forEach((chars) => {
+                        gsap.to(chars, {
+                            y: "0%",
+                            duration: 0.8,
+                            ease: "power3.out",
+                            stagger: 0.02,
+                            scrollTrigger: {
+                                trigger: el,
+                                start: "top 85%",
+                                toggleActions: "play none none none",
+                            },
+                        });
                     });
                 }
             });
 
             // ── Line Reveal Animations ──────────────────────────
-            const lineTargets = document.querySelectorAll(
+            const darkLineTargets = document.querySelectorAll(
                 ".layer__dark .js-anim--lines--sim",
+            );
+            const redLineTargets = document.querySelectorAll(
+                ".layer__red .js-anim--lines--sim",
             );
             const lineObserver = new IntersectionObserver(
                 (entries) => {
@@ -421,8 +615,16 @@ export default function Home() {
                                 if (sib === entry.target) index = i;
                             });
 
+                            let globalIdx = -1;
+                            darkLineTargets.forEach((target, i) => {
+                                if (target === entry.target) globalIdx = i;
+                            });
+
                             setTimeout(() => {
                                 entry.target.classList.add("is-visible");
+                                if (globalIdx !== -1 && redLineTargets[globalIdx]) {
+                                    redLineTargets[globalIdx].classList.add("is-visible");
+                                }
                             }, index * 100);
 
                             lineObserver.unobserve(entry.target);
@@ -432,23 +634,37 @@ export default function Home() {
                 { threshold: 0.15, rootMargin: "0px 0px -50px 0px" },
             );
 
-            lineTargets.forEach((el) => lineObserver.observe(el));
+            darkLineTargets.forEach((el) => lineObserver.observe(el));
 
             // ── Scroll Paragraph Mask ───────────────────────────
-            const paragraphs = document.querySelectorAll(
+            const darkParagraphs = document.querySelectorAll(
                 ".layer__dark .js-scroll-paragraph-mask",
             );
-            paragraphs.forEach((p) => {
-                const split = new SplitType(p as HTMLElement, {
+            const redParagraphs = document.querySelectorAll(
+                ".layer__red .js-scroll-paragraph-mask",
+            );
+            darkParagraphs.forEach((p, idx) => {
+                const darkSplit = new SplitType(p as HTMLElement, {
                     types: "words",
                 });
-                splitInstances.push(split);
-
-                split.words?.forEach((word) => {
+                splitInstances.push(darkSplit);
+                darkSplit.words?.forEach((word) => {
                     word.classList.add("word");
                 });
 
-                gsap.to(split.words, {
+                const redP = redParagraphs[idx];
+                let redSplit: SplitType | null = null;
+                if (redP) {
+                    redSplit = new SplitType(redP as HTMLElement, {
+                        types: "words",
+                    });
+                    splitInstances.push(redSplit);
+                    redSplit.words?.forEach((word) => {
+                        word.classList.add("word");
+                    });
+                }
+
+                gsap.to(darkSplit.words, {
                     opacity: 1,
                     stagger: 0.05,
                     ease: "none",
@@ -459,13 +675,30 @@ export default function Home() {
                         scrub: 1,
                     },
                 });
+
+                if (redSplit && redSplit.words) {
+                    gsap.to(redSplit.words, {
+                        opacity: 1,
+                        stagger: 0.05,
+                        ease: "none",
+                        scrollTrigger: {
+                            trigger: p,
+                            start: "top 75%",
+                            end: "bottom 40%",
+                            scrub: 1,
+                        },
+                    });
+                }
             });
 
             // ── Parallax Floating Elements ──────────────────────
-            const floats = document.querySelectorAll(
+            const darkFloats = document.querySelectorAll(
                 ".layer__dark [data-parallax-speed]",
             );
-            floats.forEach((el) => {
+            const redFloats = document.querySelectorAll(
+                ".layer__red [data-parallax-speed]",
+            );
+            darkFloats.forEach((el, idx) => {
                 const speed = parseFloat(
                     el.getAttribute("data-parallax-speed") || "0",
                 );
@@ -492,14 +725,24 @@ export default function Home() {
                 }
 
                 gsap.to(el, animProps);
+
+                const redFloat = redFloats[idx];
+                if (redFloat) {
+                    gsap.to(redFloat, animProps);
+                }
             });
 
             // ── Hero Floating Animation ──────────────────────────
-            const heroImageWrappers = document.querySelectorAll(
-                ".hero__image-wrapper",
+            const darkHeroImageWrappers = document.querySelectorAll(
+                ".layer__dark .hero__image-wrapper",
             );
-            heroImageWrappers.forEach((wrapper) => {
-                gsap.to(wrapper, {
+            const redHeroImageWrappers = document.querySelectorAll(
+                ".layer__red .hero__image-wrapper",
+            );
+            darkHeroImageWrappers.forEach((wrapper, idx) => {
+                const redWrapper = redHeroImageWrappers[idx];
+                const wrappers = [wrapper, redWrapper].filter(Boolean);
+                gsap.to(wrappers, {
                     y: "12px",
                     duration: 3.5,
                     ease: "sine.inOut",
@@ -508,9 +751,12 @@ export default function Home() {
                 });
             });
 
-            const floatCards = document.querySelectorAll(".hero__float-card");
-            floatCards.forEach((card, idx) => {
-                gsap.to(card, {
+            const darkFloatCards = document.querySelectorAll(".layer__dark .hero__float-card");
+            const redFloatCards = document.querySelectorAll(".layer__red .hero__float-card");
+            darkFloatCards.forEach((card, idx) => {
+                const redCard = redFloatCards[idx];
+                const cards = [card, redCard].filter(Boolean);
+                gsap.to(cards, {
                     y: idx % 2 === 0 ? "8px" : "-8px",
                     x: idx % 3 === 0 ? "5px" : "-5px",
                     duration: 3 + idx * 0.5,
@@ -535,24 +781,30 @@ export default function Home() {
                     const darkChild = darkChildren[i] as HTMLElement;
                     const redChild = redChildren[i] as HTMLElement;
                     redChild.style.minHeight = "";
+                    redChild.style.height = "";
                     const darkH = darkChild.offsetHeight;
-                    redChild.style.minHeight = darkH + "px";
+                    redChild.style.height = darkH + "px";
                 }
+            };
+
+            const handleResize = () => {
+                syncLayerHeights();
+                resizeWebGL();
             };
 
             if (document.fonts && document.fonts.ready) {
                 document.fonts.ready.then(() => {
-                    syncLayerHeights();
+                    handleResize();
                     ScrollTrigger.refresh();
                 });
             } else {
                 setTimeout(() => {
-                    syncLayerHeights();
+                    handleResize();
                     ScrollTrigger.refresh();
                 }, 500);
             }
 
-            window.addEventListener("resize", syncLayerHeights);
+            window.addEventListener("resize", handleResize);
 
             // ── Nav Smooth Scroll ────────────────────────────────
             const navLinks = document.querySelectorAll(
@@ -574,51 +826,70 @@ export default function Home() {
 
             // ── 3D Tilt on Project Cards ─────────────────────────
             if (!isTouchDevice) {
-                const projects = document.querySelectorAll(
+                const darkProjects = document.querySelectorAll(
                     ".layer__dark .project[data-tilt]",
                 );
-                projects.forEach((project) => {
+                const redProjects = document.querySelectorAll(
+                    ".layer__red .project[data-tilt]",
+                );
+                darkProjects.forEach((project, idx) => {
+                    const redProject = redProjects[idx];
                     project.addEventListener("mousemove", (e) => {
                         const ev = e as MouseEvent;
                         const rect = project.getBoundingClientRect();
                         const x = (ev.clientX - rect.left) / rect.width - 0.5;
                         const y = (ev.clientY - rect.top) / rect.height - 0.5;
-                        gsap.to(project, {
+                        
+                        const animObj = {
                             rotateY: x * 8,
                             rotateX: -y * 5,
                             x: x * 15,
                             duration: 0.4,
                             ease: "power2.out",
                             transformPerspective: 800,
-                        });
+                        };
+                        gsap.to(project, animObj);
+                        if (redProject) {
+                            gsap.to(redProject, animObj);
+                        }
                     });
 
                     project.addEventListener("mouseleave", () => {
-                        gsap.to(project, {
+                        const resetObj = {
                             rotateY: 0,
                             rotateX: 0,
                             x: 0,
                             duration: 0.6,
                             ease: "elastic.out(1, 0.5)",
-                        });
+                        };
+                        gsap.to(project, resetObj);
+                        if (redProject) {
+                            gsap.to(redProject, resetObj);
+                        }
                     });
                 });
             }
 
             // ── Clean Up ─────────────────────────────────────────
             return () => {
-                if (!isTouchDevice) {
-                    document.removeEventListener("mousemove", handleMouseMove);
-                    gsap.ticker.remove(cursorTicker);
-                }
+                document.removeEventListener("mousemove", handleMouseMove);
+                document.removeEventListener("touchmove", handleTouchMove);
+                gsap.ticker.remove(cursorTicker);
                 document.removeEventListener("keydown", handleKeyDown);
                 document.removeEventListener("keyup", handleKeyUp);
-                window.removeEventListener("resize", syncLayerHeights);
+                window.removeEventListener("resize", handleResize);
                 lineObserver.disconnect();
                 splitInstances.forEach((inst) => inst.revert());
                 if (lenis) {
                     lenis.destroy();
                 }
+
+                // Clean up WebGL resources
+                pingPongTargets.forEach((t) => t.dispose());
+                trailsMaterial.dispose();
+                maskMaterial.dispose();
+                planeGeometry.dispose();
+                renderer.dispose();
             };
         },
         { dependencies: [] },
