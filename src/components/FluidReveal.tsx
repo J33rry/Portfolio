@@ -24,16 +24,16 @@ import {
 
 const CONFIG = {
   SIM_RESOLUTION: 64,
-  DYE_RESOLUTION: 256,
-  DENSITY_DISSIPATION: 0.97,
-  VELOCITY_DISSIPATION: 0.98,
+  DYE_RESOLUTION: 512,
+  DENSITY_DISSIPATION: 0.985,
+  VELOCITY_DISSIPATION: 0.97,
   PRESSURE: 0.8,
   PRESSURE_ITERATIONS: 20,
-  CURL: 20,
-  SPLAT_RADIUS: 0.5,
-  SPLAT_FORCE: 3000,
-  MOUSE_LERP: 0.08,
-  REFRACTION_STRENGTH: 0.004,
+  CURL: 15,
+  SPLAT_RADIUS: 1.2,
+  SPLAT_FORCE: 2000,
+  MOUSE_LERP: 0.06,
+  REFRACTION_STRENGTH: 0.003,
 };
 
 /* ═══════════════════════════════════════════════════════════════════════════
@@ -334,9 +334,12 @@ const FluidReveal = forwardRef<FluidRevealHandle, FluidRevealProps>(
       const canvasEl = canvasRef.current;
       if (!canvasEl) return;
 
+      // Non-null reference for use in nested closures
+      const canvas: HTMLCanvasElement = canvasEl;
+
       /* ─── WebGL2 Context ─────────────────────────────────── */
 
-      const glCtx = canvasEl.getContext("webgl2", {
+      const glCtx = canvas.getContext("webgl2", {
         alpha: true,
         depth: false,
         stencil: false,
@@ -350,7 +353,9 @@ const FluidReveal = forwardRef<FluidRevealHandle, FluidRevealProps>(
         console.warn("FluidReveal: WebGL2 not available");
         return;
       }
-      const gl = glCtx;
+
+      // Non-null reference for use in nested closures
+      const gl: WebGL2RenderingContext = glCtx;
 
       gl.getExtension("EXT_color_buffer_float");
       const supportLinearFiltering = !!gl.getExtension(
@@ -619,8 +624,8 @@ const FluidReveal = forwardRef<FluidRevealHandle, FluidRevealProps>(
       const dyeRes = getResolution(CONFIG.DYE_RESOLUTION);
       const simRes = getResolution(CONFIG.SIM_RESOLUTION);
 
-      canvasEl.width = dyeRes.width;
-      canvasEl.height = dyeRes.height;
+      canvas.width = dyeRes.width;
+      canvas.height = dyeRes.height;
 
       const dyeFmt = formatRGBA!;
       const simFmt = formatRG || formatRGBA!;
@@ -665,7 +670,7 @@ const FluidReveal = forwardRef<FluidRevealHandle, FluidRevealProps>(
         gl.uniform1i(splatProg.uniforms.uTarget, velocity.read.attach(0));
         gl.uniform1f(
           splatProg.uniforms.aspectRatio,
-          canvasEl!.width / canvasEl!.height
+          canvas.width / canvas.height
         );
         gl.uniform2f(splatProg.uniforms.point, x, y);
         gl.uniform3f(splatProg.uniforms.color, dx, dy, 0.0);
@@ -895,6 +900,8 @@ const FluidReveal = forwardRef<FluidRevealHandle, FluidRevealProps>(
       let lastTime = Date.now();
       let frameCount = 0;
       let maskCleared = true;
+      let blobPending = false;
+      let prevBlobUrl: string | null = null;
 
       function update() {
         animId = requestAnimationFrame(update);
@@ -966,44 +973,36 @@ const FluidReveal = forwardRef<FluidRevealHandle, FluidRevealProps>(
         const elapsed = now - lastSplatTime;
 
         if (elapsed < 6000) {
-          // Active: update mask every other frame for perf
-          if (frameCount % 2 === 0) {
-            const dataUrl = canvasEl!.toDataURL("image/png");
-            const w = window.innerWidth;
-            const h = window.innerHeight;
-            
-            redLayer.style.setProperty(
-              "-webkit-mask-image",
-              `url(${dataUrl})`
-            );
-            redLayer.style.setProperty("mask-image", `url(${dataUrl})`);
-            
-            redLayer.style.setProperty(
-              "-webkit-mask-size",
-              `${w}px ${h}px`
-            );
-            redLayer.style.setProperty(
-              "mask-size",
-              `${w}px ${h}px`
-            );
-            
-            redLayer.style.setProperty(
-              "-webkit-mask-repeat",
-              "no-repeat"
-            );
-            redLayer.style.setProperty(
-              "mask-repeat",
-              "no-repeat"
-            );
+          // Active: update mask via blob URL (much faster than toDataURL)
+          if (frameCount % 2 === 0 && !blobPending) {
+            blobPending = true;
+            canvas.toBlob((blob) => {
+              blobPending = false;
+              if (!blob) return;
+              // Revoke previous blob URL to prevent memory leak
+              if (prevBlobUrl) URL.revokeObjectURL(prevBlobUrl);
+              const url = URL.createObjectURL(blob);
+              prevBlobUrl = url;
 
-            redLayer.style.setProperty(
-              "-webkit-mask-position",
-              `0 ${window.scrollY}px`
-            );
-            redLayer.style.setProperty(
-              "mask-position",
-              `0 ${window.scrollY}px`
-            );
+              redLayer.style.setProperty(
+                "-webkit-mask-image",
+                `url(${url})`
+              );
+              redLayer.style.setProperty("mask-image", `url(${url})`);
+              // Force mask to stretch across the full viewport
+              redLayer.style.setProperty("-webkit-mask-size", "100% 100%");
+              redLayer.style.setProperty("mask-size", "100% 100%");
+              redLayer.style.setProperty("-webkit-mask-repeat", "no-repeat");
+              redLayer.style.setProperty("mask-repeat", "no-repeat");
+              redLayer.style.setProperty(
+                "-webkit-mask-position",
+                `0 ${window.scrollY}px`
+              );
+              redLayer.style.setProperty(
+                "mask-position",
+                `0 ${window.scrollY}px`
+              );
+            });
           }
         } else if (!maskCleared) {
           // Fluid fully dissipated — clear mask once
@@ -1015,6 +1014,10 @@ const FluidReveal = forwardRef<FluidRevealHandle, FluidRevealProps>(
             "mask-image",
             "linear-gradient(transparent, transparent)"
           );
+          if (prevBlobUrl) {
+            URL.revokeObjectURL(prevBlobUrl);
+            prevBlobUrl = null;
+          }
           maskCleared = true;
         }
 
@@ -1031,8 +1034,8 @@ const FluidReveal = forwardRef<FluidRevealHandle, FluidRevealProps>(
           const newDye = getResolution(CONFIG.DYE_RESOLUTION);
           const newSim = getResolution(CONFIG.SIM_RESOLUTION);
 
-          canvasEl!.width = newDye.width;
-          canvasEl!.height = newDye.height;
+          canvas.width = newDye.width;
+          canvas.height = newDye.height;
 
           deleteDoubleFBO(dye);
           deleteDoubleFBO(velocity);
@@ -1090,6 +1093,8 @@ const FluidReveal = forwardRef<FluidRevealHandle, FluidRevealProps>(
           redLayer.style.removeProperty("-webkit-mask-image");
           redLayer.style.removeProperty("mask-image");
         }
+        // Revoke any remaining blob URL
+        if (prevBlobUrl) URL.revokeObjectURL(prevBlobUrl);
       };
     }, [maskerRef]);
 
