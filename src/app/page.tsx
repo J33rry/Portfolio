@@ -14,12 +14,14 @@ import Experience from "@/components/Experience";
 import Stats from "@/components/Stats";
 import Testimonials from "@/components/Testimonials";
 import Contact from "@/components/Contact";
-import Footer from "@/components/Footer";import * as THREE from "three";
+import Footer from "@/components/Footer";
+import * as THREE from "three";
 import {
     vertexShader,
     aspectCorrectedFluidFragmentShader,
     aspectCorrectedMaskFragmentShader,
-} from "./example/shader";
+    dissolveFragmentShader,
+} from "@/shaders/shader";
 
 if (typeof window !== "undefined") {
     gsap.registerPlugin(ScrollTrigger);
@@ -30,6 +32,8 @@ export default function Home() {
     const maskerRef = useRef<HTMLDivElement>(null);
     const revealBtnRef = useRef<HTMLButtonElement>(null);
     const pageRef = useRef<HTMLDivElement>(null);
+    const dissolveDarkCanvasRef = useRef<HTMLCanvasElement>(null);
+    const dissolveRedCanvasRef = useRef<HTMLCanvasElement>(null);
 
     useGSAP(
         () => {
@@ -87,6 +91,125 @@ export default function Home() {
                 console.warn("Lenis init failed:", e);
             }
 
+            // ── Hero Dissolve Transition Setup ───────────────────
+            const dissolveRenderers: THREE.WebGLRenderer[] = [];
+            const dissolveMaterials: THREE.ShaderMaterial[] = [];
+            const dissolveGeometries: THREE.PlaneGeometry[] = [];
+            let dissolveScrollProgress = 0;
+            let dissolveAnimId: number | null = null;
+
+            const dissolveConfigs = [
+                {
+                    canvas: dissolveDarkCanvasRef.current,
+                    wrapperId: "hero-dissolve-dark",
+                    color: { r: 0.961, g: 0.961, b: 0.969 }, // #f5f5f7
+                },
+                {
+                    canvas: dissolveRedCanvasRef.current,
+                    wrapperId: "hero-dissolve-red",
+                    color: { r: 0.102, g: 0.02, b: 0.031 }, // #1a0508
+                },
+            ];
+
+            dissolveConfigs.forEach(({ canvas, color }) => {
+                if (!canvas) return;
+
+                const dRenderer = new THREE.WebGLRenderer({
+                    canvas,
+                    alpha: true,
+                    antialias: false,
+                });
+                dRenderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+                dissolveRenderers.push(dRenderer);
+
+                const dScene = new THREE.Scene();
+                const dCamera = new THREE.OrthographicCamera(
+                    -1,
+                    1,
+                    1,
+                    -1,
+                    0,
+                    1,
+                );
+
+                const dGeometry = new THREE.PlaneGeometry(2, 2);
+                dissolveGeometries.push(dGeometry);
+
+                const dMaterial = new THREE.ShaderMaterial({
+                    vertexShader,
+                    fragmentShader: dissolveFragmentShader,
+                    uniforms: {
+                        uProgress: { value: 0 },
+                        uResolution: {
+                            value: new THREE.Vector2(
+                                canvas.offsetWidth || window.innerWidth,
+                                canvas.offsetHeight || window.innerHeight,
+                            ),
+                        },
+                        uColor: {
+                            value: new THREE.Vector3(color.r, color.g, color.b),
+                        },
+                        uSpread: { value: 0.5 },
+                    },
+                    transparent: true,
+                });
+                dissolveMaterials.push(dMaterial);
+
+                const dMesh = new THREE.Mesh(dGeometry, dMaterial);
+                dScene.add(dMesh);
+
+                // Size the renderer to the canvas element
+                const resizeDissolve = () => {
+                    const w = canvas.clientWidth || window.innerWidth;
+                    const h = canvas.clientHeight || window.innerHeight;
+                    dRenderer.setSize(w, h, false);
+                    dMaterial.uniforms.uResolution.value.set(w, h);
+                };
+                resizeDissolve();
+                window.addEventListener("resize", resizeDissolve);
+
+                // Store for cleanup
+                (dRenderer as any).__resizeDissolve = resizeDissolve;
+                (dRenderer as any).__scene = dScene;
+                (dRenderer as any).__camera = dCamera;
+            });
+
+            // Scroll-driven dissolve progress via Lenis
+            if (lenis) {
+                lenis.on("scroll", ({ scroll }: { scroll: number }) => {
+                    dissolveConfigs.forEach(({ wrapperId }, i) => {
+                        const wrapper = document.getElementById(wrapperId);
+                        if (!wrapper) return;
+                        const wrapperTop = wrapper.offsetTop;
+                        const scrollableDistance =
+                            wrapper.offsetHeight - window.innerHeight;
+                        if (scrollableDistance <= 0) return;
+                        const localScroll = scroll - wrapperTop;
+                        const progress = Math.min(
+                            Math.max((localScroll / scrollableDistance) * 2, 0),
+                            1.01,
+                        );
+                        if (dissolveMaterials[i]) {
+                            dissolveMaterials[i].uniforms.uProgress.value =
+                                progress;
+                        }
+                    });
+                });
+            }
+
+            // Render loop for dissolve canvases
+            const dissolveAnimate = () => {
+                dissolveRenderers.forEach((dRenderer) => {
+                    const dScene = (dRenderer as any).__scene;
+                    const dCamera = (dRenderer as any).__camera;
+                    if (dScene && dCamera) {
+                        dRenderer.render(dScene, dCamera);
+                    }
+                });
+                dissolveAnimId = requestAnimationFrame(dissolveAnimate);
+            };
+            dissolveAnimate();
+
             // ── WebGL Fluid Mask Simulation Setup ────────────────
             const decay = 0.97;
             const maskResolution = 400; // longest side of the offscreen mask canvas, in px
@@ -104,22 +227,24 @@ export default function Home() {
                 const docElement = document.documentElement;
                 const body = document.body;
                 return {
-                    width: Math.max(
-                        body.scrollWidth,
-                        docElement.scrollWidth,
-                        body.offsetWidth,
-                        docElement.offsetWidth,
-                        body.clientWidth,
-                        docElement.clientWidth
-                    ) || 1,
-                    height: Math.max(
-                        body.scrollHeight,
-                        docElement.scrollHeight,
-                        body.offsetHeight,
-                        docElement.offsetHeight,
-                        body.clientHeight,
-                        docElement.clientHeight
-                    ) || 1,
+                    width:
+                        Math.max(
+                            body.scrollWidth,
+                            docElement.scrollWidth,
+                            body.offsetWidth,
+                            docElement.offsetWidth,
+                            body.clientWidth,
+                            docElement.clientWidth,
+                        ) || 1,
+                    height:
+                        Math.max(
+                            body.scrollHeight,
+                            docElement.scrollHeight,
+                            body.offsetHeight,
+                            docElement.offsetHeight,
+                            body.clientHeight,
+                            docElement.clientHeight,
+                        ) || 1,
                 };
             };
 
@@ -180,7 +305,12 @@ export default function Home() {
             const maskMaterial = new THREE.ShaderMaterial({
                 uniforms: {
                     uFluid: { value: null },
-                    uDpr: { value: typeof window !== "undefined" ? window.devicePixelRatio || 1 : 1 },
+                    uDpr: {
+                        value:
+                            typeof window !== "undefined"
+                                ? window.devicePixelRatio || 1
+                                : 1,
+                    },
                     uRevealProgress: { value: 0.0 },
                     uRevealCenter: { value: new THREE.Vector2(0.5, 0.5) },
                     uResolution: { value: new THREE.Vector2(maskW, maskH) },
@@ -262,7 +392,7 @@ export default function Home() {
 
                 webglPrevMouse.copy(webglMouse);
                 webglMouse.x = pageCursorX / pageW;
-                webglMouse.y = 1.0 - (pageCursorY / pageH);
+                webglMouse.y = 1.0 - pageCursorY / pageH;
 
                 const deltaMove = webglMouse.distanceToSquared(webglPrevMouse);
                 if (deltaMove > 0.000001) {
@@ -287,8 +417,10 @@ export default function Home() {
                 renderer.setRenderTarget(currentRenderTarget);
                 renderer.render(simScene, camera);
 
-                maskMaterial.uniforms.uFluid.value = currentRenderTarget.texture;
-                maskMaterial.uniforms.uRevealProgress.value = revealState.progress;
+                maskMaterial.uniforms.uFluid.value =
+                    currentRenderTarget.texture;
+                maskMaterial.uniforms.uRevealProgress.value =
+                    revealState.progress;
 
                 renderer.setRenderTarget(null);
                 renderer.render(scene, camera);
@@ -313,7 +445,9 @@ export default function Home() {
             };
 
             document.addEventListener("mousemove", handleMouseMove);
-            document.addEventListener("touchmove", handleTouchMove, { passive: true });
+            document.addEventListener("touchmove", handleTouchMove, {
+                passive: true,
+            });
             gsap.ticker.add(cursorTicker);
 
             // ── Cursor States (extend / contract / snap) ─────────
@@ -430,7 +564,7 @@ export default function Home() {
 
                 maskMaterial.uniforms.uRevealCenter.value.set(
                     pageCenterX / pW,
-                    1.0 - (pageCenterY / pH)
+                    1.0 - pageCenterY / pH,
                 );
 
                 if (revealTween) revealTween.kill();
@@ -439,7 +573,8 @@ export default function Home() {
                     duration: 0.9,
                     ease: "power3.out",
                     onUpdate: () => {
-                        maskMaterial.uniforms.uRevealProgress.value = revealState.progress;
+                        maskMaterial.uniforms.uRevealProgress.value =
+                            revealState.progress;
                     },
                 });
             };
@@ -451,7 +586,8 @@ export default function Home() {
                     duration: 0.5,
                     ease: "power2.in",
                     onUpdate: () => {
-                        maskMaterial.uniforms.uRevealProgress.value = revealState.progress;
+                        maskMaterial.uniforms.uRevealProgress.value =
+                            revealState.progress;
                     },
                     onComplete: () => {
                         isRevealing = false;
@@ -575,7 +711,7 @@ export default function Home() {
                 } else {
                     const targetsToAnim = [
                         darkSplit.chars,
-                        redSplit ? redSplit.chars : null
+                        redSplit ? redSplit.chars : null,
                     ].filter((t): t is HTMLElement[] => t !== null);
 
                     targetsToAnim.forEach((chars) => {
@@ -622,8 +758,13 @@ export default function Home() {
 
                             setTimeout(() => {
                                 entry.target.classList.add("is-visible");
-                                if (globalIdx !== -1 && redLineTargets[globalIdx]) {
-                                    redLineTargets[globalIdx].classList.add("is-visible");
+                                if (
+                                    globalIdx !== -1 &&
+                                    redLineTargets[globalIdx]
+                                ) {
+                                    redLineTargets[globalIdx].classList.add(
+                                        "is-visible",
+                                    );
                                 }
                             }, index * 100);
 
@@ -751,8 +892,12 @@ export default function Home() {
                 });
             });
 
-            const darkFloatCards = document.querySelectorAll(".layer__dark .hero__float-card");
-            const redFloatCards = document.querySelectorAll(".layer__red .hero__float-card");
+            const darkFloatCards = document.querySelectorAll(
+                ".layer__dark .hero__float-card",
+            );
+            const redFloatCards = document.querySelectorAll(
+                ".layer__red .hero__float-card",
+            );
             darkFloatCards.forEach((card, idx) => {
                 const redCard = redFloatCards[idx];
                 const cards = [card, redCard].filter(Boolean);
@@ -839,7 +984,7 @@ export default function Home() {
                         const rect = project.getBoundingClientRect();
                         const x = (ev.clientX - rect.left) / rect.width - 0.5;
                         const y = (ev.clientY - rect.top) / rect.height - 0.5;
-                        
+
                         const animObj = {
                             rotateY: x * 8,
                             rotateX: -y * 5,
@@ -890,6 +1035,19 @@ export default function Home() {
                 maskMaterial.dispose();
                 planeGeometry.dispose();
                 renderer.dispose();
+
+                // Clean up dissolve resources
+                if (dissolveAnimId !== null) {
+                    cancelAnimationFrame(dissolveAnimId);
+                }
+                dissolveRenderers.forEach((dRenderer) => {
+                    const resizeFn = (dRenderer as any).__resizeDissolve;
+                    if (resizeFn)
+                        window.removeEventListener("resize", resizeFn);
+                    dRenderer.dispose();
+                });
+                dissolveMaterials.forEach((m) => m.dispose());
+                dissolveGeometries.forEach((g) => g.dispose());
             };
         },
         { dependencies: [] },
@@ -919,34 +1077,16 @@ export default function Home() {
 
                     <Navbar layer="dark" />
 
-                    <Hero layer="dark" />
-
-                    {/* Marquee */}
-                    <div className="marquee">
-                        <div className="marquee__track">
-                            <span className="marquee__content">
-                                REACT NATIVE&nbsp; •&nbsp; NEXT.JS&nbsp; •&nbsp;
-                                NODE.JS&nbsp; •&nbsp; DOCKER&nbsp; •&nbsp;
-                                POSTGRESQL&nbsp; •&nbsp; MONGODB&nbsp; •&nbsp;
-                                FIREBASE&nbsp; •&nbsp; EXPRESS&nbsp; •&nbsp;
-                                GSAP&nbsp; •&nbsp; THREE.JS&nbsp; •&nbsp;
-                                TURBOREPO&nbsp; •&nbsp; DRIZZLE ORM&nbsp;
-                                •&nbsp;
-                            </span>
-                            <span
-                                className="marquee__content"
-                                aria-hidden="true"
-                            >
-                                REACT NATIVE&nbsp; •&nbsp; NEXT.JS&nbsp; •&nbsp;
-                                NODE.JS&nbsp; •&nbsp; DOCKER&nbsp; •&nbsp;
-                                POSTGRESQL&nbsp; •&nbsp; MONGODB&nbsp; •&nbsp;
-                                FIREBASE&nbsp; •&nbsp; EXPRESS&nbsp; •&nbsp;
-                                GSAP&nbsp; •&nbsp; THREE.JS&nbsp; •&nbsp;
-                                TURBOREPO&nbsp; •&nbsp; DRIZZLE ORM&nbsp;
-                                •&nbsp;
-                            </span>
+                    <div className="hero-dissolve" id="hero-dissolve-dark">
+                        <div className="hero-dissolve__sticky">
+                            <Hero layer="dark" />
+                            <canvas
+                                className="hero-dissolve__canvas"
+                                ref={dissolveDarkCanvasRef}
+                            />
                         </div>
                     </div>
+
                     <About layer="dark" />
                     <Projects layer="dark" />
                     <Experience layer="dark" />
@@ -975,29 +1115,14 @@ export default function Home() {
                     </div>
 
                     <Navbar layer="red" />
-                    <Hero layer="red" />
 
-                    {/* Marquee */}
-                    <div className="marquee">
-                        <div className="marquee__track">
-                            <span className="marquee__content">
-                                CONSOLE.LOG&nbsp; •&nbsp; CHATGPT&nbsp; •&nbsp;
-                                NPM INSTALL --FORCE&nbsp;•&nbsp; GEMINI&nbsp;
-                                •&nbsp; GIT PUSH -F&nbsp; •&nbsp;
-                                CTRL+Z&nbsp;•&nbsp; CLAUDE&nbsp; •&nbsp; IT
-                                WORKS ON MY MACHINE&nbsp; •&nbsp; TODO: FIX
-                                LATER&nbsp; •&nbsp; MASS GOOGLE&nbsp; •&nbsp;
-                                MASS PRAY&nbsp; •&nbsp;
-                            </span>
-                            <span className="marquee__content">
-                                CONSOLE.LOG&nbsp; •&nbsp; CHATGPT&nbsp; •&nbsp;
-                                NPM INSTALL --FORCE&nbsp;•&nbsp; GEMINI&nbsp;
-                                •&nbsp; GIT PUSH -F&nbsp; •&nbsp;
-                                CTRL+Z&nbsp;•&nbsp; CLAUDE&nbsp; •&nbsp; IT
-                                WORKS ON MY MACHINE&nbsp; •&nbsp; TODO: FIX
-                                LATER&nbsp; •&nbsp; MASS GOOGLE&nbsp; •&nbsp;
-                                MASS PRAY&nbsp; •&nbsp;
-                            </span>
+                    <div className="hero-dissolve" id="hero-dissolve-red">
+                        <div className="hero-dissolve__sticky">
+                            <Hero layer="red" />
+                            <canvas
+                                className="hero-dissolve__canvas"
+                                ref={dissolveRedCanvasRef}
+                            />
                         </div>
                     </div>
 
