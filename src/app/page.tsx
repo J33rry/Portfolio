@@ -1093,7 +1093,7 @@ export default function Home() {
                     <Projects layer="dark" />
                     <Experience layer="dark" />
                     <Stats layer="dark" />
-                    <Testimonials layer="dark" />
+                    {/* <Testimonials layer="dark" /> */}
                     <Contact layer="dark" />
                     <Footer layer="dark" />
                 </div>
@@ -1132,7 +1132,7 @@ export default function Home() {
                     <Projects layer="red" />
                     <Experience layer="red" />
                     <Stats layer="red" />
-                    <Testimonials layer="red" />
+                    {/* <Testimonials layer="red" /> */}
                     <Contact layer="red" />
                     <Footer layer="red" />
                 </div>

@@ -1,9 +1,122 @@
 import React from "react";
 import { MouseAsset, CoffeeAsset } from "./SVGAssets";
+import SkillsOrbit from "./SkillsOrbit";
 
 interface AboutProps {
     layer: "dark" | "red";
 }
+
+interface SkillCategory {
+    title: string;
+    skills: string[];
+}
+
+const professionalCategories: SkillCategory[] = [
+    {
+        title: "Languages",
+        skills: ["C++", "Python", "JavaScript (ES6+)", "SQL"],
+    },
+    {
+        title: "Frontend",
+        skills: [
+            "React.js",
+            "Next.js 15",
+            "React Native (Expo)",
+            "Tailwind CSS",
+            "NativeWind",
+            "GSAP",
+        ],
+    },
+    {
+        title: "Backend",
+        skills: [
+            "Node.js",
+            "Express.js",
+            "Socket.io",
+            "Firebase Admin SDK",
+            "Puppeteer",
+            "Cheerio",
+            "node-cron",
+        ],
+    },
+    {
+        title: "Databases",
+        skills: ["MongoDB", "PostgreSQL", "Drizzle ORM", "Supabase", "NeonDB"],
+    },
+    {
+        title: "Cloud & DevOps",
+        skills: [
+            "Docker",
+            "Turborepo",
+            "Azure App Service",
+            "Vercel",
+            "Render",
+            "Firebase (Auth, FCM)",
+            "Clerk",
+            "Git/GitHub",
+        ],
+    },
+    {
+        title: "Concepts",
+        skills: ["DSA", "DBMS", "OOP", "Computer Networks", "System Design"],
+    },
+];
+
+const satiricalCategories: SkillCategory[] = [
+    {
+        title: "Languages",
+        skills: [
+            "Swearing at Compiler",
+            "English (Barely)",
+            "Copy-Paste (Advanced)",
+            "HTML (as programming language)",
+        ],
+    },
+    {
+        title: "Frontend",
+        skills: [
+            "flex justify-center items-center",
+            "resizing browser until it works",
+            "ChatGPT frontend",
+            "console.log",
+        ],
+    },
+    {
+        title: "Backend",
+        skills: [
+            "Express.js (without error handling)",
+            "localhost:3000",
+            "unhandledPromiseRejection",
+            "Error 500",
+        ],
+    },
+    {
+        title: "Databases",
+        skills: [
+            "git commit as backup",
+            "SELECT * FROM users",
+            "123456 password hashes",
+        ],
+    },
+    {
+        title: "Cloud & DevOps",
+        skills: [
+            "git push",
+            '"Works on my machine"',
+            "free tiers only",
+            "deploy on Friday night",
+        ],
+    },
+    {
+        title: "Concepts",
+        skills: [
+            "Stack Overflow",
+            "Trial & Error",
+            "Prayer-driven dev",
+            '"It\'s a feature, not a bug"',
+        ],
+    },
+];
 
 export default function About({ layer }: AboutProps) {
     const techStackDark = [
@@ -92,12 +205,46 @@ export default function About({ layer }: AboutProps) {
                     </div>
                 </div>
 
-                <div className="marquee about__marquee">
+                <div className="about__tech-stack">
+                    <div className="about__tech-stack-header">
+                        <h3 className="about__tech-stack-title">Tech Stack</h3>
+                        <span className="about__tech-stack-subtitle">
+                            Honest Stack
+                        </span>
+                    </div>
+                    <SkillsOrbit layer="red" />
+
+                    {/* Categorized Skills Grid */}
+                    <div className="skills-grid">
+                        {satiricalCategories.map((category) => (
+                            <div
+                                key={category.title}
+                                className="skills-category"
+                            >
+                                <h4 className="skills-category__title">
+                                    {category.title}
+                                </h4>
+                                <div className="skills-category__list">
+                                    {category.skills.map((skill) => (
+                                        <span
+                                            key={skill}
+                                            className="skills-tag"
+                                        >
+                                            {skill}
+                                        </span>
+                                    ))}
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+
+                {/* <div className="marquee about__marquee">
                     <div className="marquee__track">
                         <span className="marquee__content">{redText}</span>
                         <span className="marquee__content">{redText}</span>
                     </div>
-                </div>
+                </div> */}
 
                 <MouseAsset speed={-0.15} />
                 <CoffeeAsset speed={0.2} />
@@ -149,12 +296,40 @@ export default function About({ layer }: AboutProps) {
                 </div>
             </div>
 
-            <div className="marquee about__marquee">
+            <div className="about__tech-stack">
+                <div className="about__tech-stack-header">
+                    <h3 className="about__tech-stack-title">Tech Stack</h3>
+                    <span className="about__tech-stack-subtitle">
+                        Full-Stack &amp; Mobile
+                    </span>
+                </div>
+                <SkillsOrbit layer="dark" />
+
+                {/* Categorized Skills Grid */}
+                <div className="skills-grid">
+                    {professionalCategories.map((category) => (
+                        <div key={category.title} className="skills-category">
+                            <h4 className="skills-category__title">
+                                {category.title}
+                            </h4>
+                            <div className="skills-category__list">
+                                {category.skills.map((skill) => (
+                                    <span key={skill} className="skills-tag">
+                                        {skill}
+                                    </span>
+                                ))}
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            </div>
+
+            {/* <div className="marquee about__marquee">
                 <div className="marquee__track">
                     <span className="marquee__content">{darkText}</span>
                     <span className="marquee__content">{darkText}</span>
                 </div>
-            </div>
+            </div> */}
 
             <MouseAsset speed={-0.15} />
             <CoffeeAsset speed={0.2} />
