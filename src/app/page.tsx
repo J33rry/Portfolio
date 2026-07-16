@@ -223,8 +223,11 @@ export default function Home() {
             dissolveAnimate();
 
             // ── WebGL Fluid Mask Simulation Setup ────────────────
-            const decay = 0.92;
-            const maskResolution = 1000;
+            const decay = 0.9;
+            const maskResolution = Math.max(
+                window.innerHeight,
+                window.innerWidth,
+            );
 
             const maskCanvas = document.createElement("canvas");
             const renderer = new THREE.WebGLRenderer({
@@ -705,7 +708,10 @@ export default function Home() {
                 const isHero = el.closest(".hero");
                 if (isHero) {
                     const playHeroAnim = () => {
-                        window.removeEventListener("loader-complete", playHeroAnim);
+                        window.removeEventListener(
+                            "loader-complete",
+                            playHeroAnim,
+                        );
                         gsap.to(darkSplit.chars, {
                             y: "0%",
                             duration: 1,

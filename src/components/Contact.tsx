@@ -13,19 +13,37 @@ export default function Contact({ layer }: ContactProps) {
                     <h2 className="section__title">Don&apos;t Contact Me</h2>
                 </div>
                 <div className="contact__body">
-                    <span className="contact__email">
+                    <a
+                        href="mailto:anilm7017@gmail.com"
+                        className="contact__email js-cursor-snap js-anim--lines--sim"
+                    >
                         anilm7017@gmail.com (I probably won&apos;t reply)
-                    </span>
+                    </a>
                     <div className="contact__links">
-                        <span className="contact__link">
+                        <a
+                            href="https://github.com/J33rry"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="contact__link js-cursor-snap"
+                        >
                             GitHub (Empty green squares)
-                        </span>
-                        <span className="contact__link">
+                        </a>
+                        <a
+                            href="https://linkedin.com/in/j33rry"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="contact__link js-cursor-snap"
+                        >
                             LinkedIn (Last updated: never)
-                        </span>
-                        <span className="contact__link">
+                        </a>
+                        <a
+                            href="/Anil_SDE_Intern.pdf"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="contact__link js-cursor-snap"
+                        >
                             Resume (It&apos;s already outdated)
-                        </span>
+                        </a>
                     </div>
                 </div>
             </section>
