@@ -40,6 +40,11 @@
     mask-repeat: no-repeat;
 }
 
+.layer__red,
+.layer__red * {
+    pointer-events: none !important;
+}
+
 .layer__red > section {
     overflow: hidden;
 }

@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useEffect } from "react";
+import { useRef, useEffect, useState } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useGSAP } from "@gsap/react";
@@ -15,6 +15,7 @@ import Stats from "@/components/Stats";
 import Testimonials from "@/components/Testimonials";
 import Contact from "@/components/Contact";
 import Footer from "@/components/Footer";
+import Loader from "@/components/Loader";
 import * as THREE from "three";
 import {
     vertexShader,
@@ -28,6 +29,7 @@ if (typeof window !== "undefined") {
 }
 
 export default function Home() {
+    const [isLoading, setIsLoading] = useState(true);
     const cursorRef = useRef<HTMLDivElement>(null);
     const maskerRef = useRef<HTMLDivElement>(null);
     const revealBtnRef = useRef<HTMLButtonElement>(null);
@@ -87,6 +89,14 @@ export default function Home() {
 
                 gsap.ticker.add(lenisTicker);
                 gsap.ticker.lagSmoothing(0);
+
+                // Pause scrolling during load screen
+                lenis.stop();
+                const startLenis = () => {
+                    lenis?.start();
+                    window.removeEventListener("loader-complete", startLenis);
+                };
+                window.addEventListener("loader-complete", startLenis);
             } catch (e) {
                 console.warn("Lenis init failed:", e);
             }
@@ -694,22 +704,26 @@ export default function Home() {
 
                 const isHero = el.closest(".hero");
                 if (isHero) {
-                    gsap.to(darkSplit.chars, {
-                        y: "0%",
-                        duration: 1,
-                        ease: "power4.out",
-                        stagger: 0.03,
-                        delay: 0.3 + idx * 0.15,
-                    });
-                    if (redSplit) {
-                        gsap.to(redSplit.chars, {
+                    const playHeroAnim = () => {
+                        window.removeEventListener("loader-complete", playHeroAnim);
+                        gsap.to(darkSplit.chars, {
                             y: "0%",
                             duration: 1,
                             ease: "power4.out",
                             stagger: 0.03,
-                            delay: 0.3 + idx * 0.15,
+                            delay: 0.1 + idx * 0.15,
                         });
-                    }
+                        if (redSplit) {
+                            gsap.to(redSplit.chars, {
+                                y: "0%",
+                                duration: 1,
+                                ease: "power4.out",
+                                stagger: 0.03,
+                                delay: 0.1 + idx * 0.15,
+                            });
+                        }
+                    };
+                    window.addEventListener("loader-complete", playHeroAnim);
                 } else {
                     const targetsToAnim = [
                         darkSplit.chars,
@@ -1057,8 +1071,14 @@ export default function Home() {
 
     return (
         <>
+            {isLoading && <Loader onComplete={() => setIsLoading(false)} />}
+
             {/* ===== CUSTOM CURSOR ===== */}
-            <div className="cursor" id="cursor" ref={cursorRef} />
+            <div
+                className={`cursor ${isLoading ? "opacity-0 pointer-events-none" : ""}`}
+                id="cursor"
+                ref={cursorRef}
+            />
 
             {/* ===== THREE.JS CANVAS ===== */}
 

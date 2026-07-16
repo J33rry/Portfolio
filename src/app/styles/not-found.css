@@ -1,0 +1,237 @@
+/* ============================================================
+   ANIL.DEV PORTFOLIO — 404 NOT FOUND STYLES
+   ============================================================ */
+
+.notfound-container {
+    min-height: 100vh;
+    width: 100%;
+    position: relative;
+    background-color: var(--nf-bg, #0a0a0a);
+    color: var(--nf-text, #eee7d8);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    transition: background-color 0.4s cubic-bezier(0.25, 1, 0.5, 1), 
+                color 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+    overflow: hidden;
+    user-select: none;
+}
+
+/* ── Grid dot pattern ───────────────────────────────────── */
+.notfound-grid {
+    position: absolute;
+    inset: 0;
+    background-image: radial-gradient(
+        circle,
+        var(--nf-accent, #c9a96e) 0.8px,
+        transparent 0.8px
+    );
+    background-size: 50px 50px;
+    opacity: 0.05;
+    pointer-events: none;
+    z-index: 0;
+    transition: background-image 0.4s ease, opacity 0.4s ease, background-size 0.4s ease;
+}
+
+/* ── Content Wrapper ────────────────────────────────────── */
+.notfound-content {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    width: 90%;
+    max-width: 600px;
+    padding: 2rem 0;
+}
+
+/* ── Geolocation coordinates ────────────────────────────── */
+.notfound-coords {
+    position: absolute;
+    top: clamp(1.5rem, 5vh, 3rem);
+    right: clamp(1.5rem, 5vw, 3rem);
+    font-family: var(--font-inter), monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.15em;
+    color: var(--nf-text);
+    opacity: 0.25;
+    pointer-events: none;
+    z-index: 1;
+    transition: color 0.4s ease, opacity 0.4s ease;
+}
+
+/* ── Giant Numeral Hero ─────────────────────────────────── */
+.notfound-numeral {
+    font-family: var(--font-jaapokki-subtract), var(--font-outfit), sans-serif;
+    font-size: clamp(6rem, 18vw, 12rem);
+    font-weight: 900;
+    line-height: 0.85;
+    letter-spacing: -0.04em;
+    color: var(--nf-accent, #c9a96e);
+    margin-bottom: 1.5rem;
+    text-transform: uppercase;
+    opacity: 0;
+    transform: translateY(30px);
+    transition: color 0.4s ease;
+}
+
+/* ── Monospace Terminal Status Log ──────────────────────── */
+.notfound-status-log {
+    font-family: var(--font-inter), monospace;
+    font-size: clamp(0.65rem, 1.5vw, 0.75rem);
+    letter-spacing: 0.08em;
+    background-color: rgba(238, 231, 216, 0.03);
+    border: 1px solid rgba(238, 231, 216, 0.06);
+    padding: 0.4rem 1rem;
+    border-radius: 4px;
+    margin-bottom: 2rem;
+    color: var(--nf-text);
+    opacity: 0;
+    transform: translateY(20px);
+    transition: background-color 0.4s ease, border-color 0.4s ease, color 0.4s ease;
+}
+
+/* ── Stacked Dual Headline ──────────────────────────────── */
+.notfound-headline-wrap {
+    margin-bottom: 1.5rem;
+    opacity: 0;
+    transform: translateY(20px);
+}
+
+.notfound-headline {
+    font-family: var(--font-jaapokki-enchance), var(--font-outfit), sans-serif;
+    font-size: clamp(1.8rem, 4.5vw, 3rem);
+    line-height: 1;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    text-transform: uppercase;
+    color: var(--nf-text);
+}
+
+/* ── Supporting Description Copy ────────────────────────── */
+.notfound-desc {
+    font-family: var(--font-inter), sans-serif;
+    font-size: clamp(0.85rem, 2vw, 0.95rem);
+    line-height: 1.6;
+    color: var(--nf-text);
+    opacity: 0;
+    transform: translateY(20px);
+    max-width: 440px;
+    margin-bottom: 2.5rem;
+}
+
+/* ── CTA Button Container ───────────────────────────────── */
+.notfound-ctas {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-bottom: 3rem;
+    width: 100%;
+    opacity: 0;
+    transform: translateY(20px);
+}
+
+.notfound-cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    font-family: var(--font-inter), sans-serif;
+    font-size: 0.82rem;
+    font-weight: 500;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    padding: 0.85rem 1.8rem;
+    border-radius: 60px;
+    transition: all 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+    position: relative;
+    overflow: hidden;
+    cursor: pointer;
+}
+
+.notfound-cta--primary {
+    background: var(--nf-text, #eee7d8);
+    color: var(--nf-bg, #0a0a0a);
+    border: 1px solid transparent;
+}
+
+.notfound-cta--primary:hover {
+    background: var(--nf-accent, #c9a96e);
+    color: var(--nf-bg, #0a0a0a);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 32px rgba(201, 169, 110, 0.15);
+}
+
+.notfound-cta--secondary {
+    background: rgba(238, 231, 216, 0.03);
+    color: var(--nf-text, #eee7d8);
+    border: 1px solid rgba(238, 231, 216, 0.06);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+}
+
+.notfound-cta--secondary:hover {
+    border-color: var(--nf-accent, #c9a96e);
+    color: var(--nf-accent, #c9a96e);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 32px rgba(201, 169, 110, 0.08);
+}
+
+.notfound-cta-arrow {
+    transition: transform 0.3s ease;
+}
+
+.notfound-cta:hover .notfound-cta-arrow {
+    transform: translateX(4px);
+}
+
+/* ── Developer Excuses Log ──────────────────────────────── */
+.notfound-excuse-wrap {
+    height: 20px;
+    opacity: 0;
+    transform: translateY(15px);
+}
+
+.notfound-excuse {
+    font-family: var(--font-inter), monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.08em;
+    color: var(--nf-accent, #c9a96e);
+    opacity: 0.6;
+    text-transform: uppercase;
+    transition: color 0.4s ease;
+}
+
+/* ── Mode-Specifics (Bug Mode) ─────────────────────────── */
+.notfound-container.is-bug-mode {
+    --nf-bg: #220303;
+    --nf-text: #ffeded;
+    --nf-accent: #ff3355;
+}
+
+.notfound-container.is-bug-mode .notfound-grid {
+    opacity: 0.12;
+    background-size: 25px 25px;
+}
+
+.notfound-container.is-bug-mode .notfound-status-log {
+    background-color: rgba(255, 51, 85, 0.04);
+    border-color: rgba(255, 51, 85, 0.12);
+}
+
+.notfound-container.is-bug-mode .notfound-cta--secondary {
+    background: rgba(255, 237, 237, 0.04);
+    border-color: rgba(255, 237, 237, 0.08);
+}
+
+.notfound-container.is-bug-mode .notfound-cta--secondary:hover {
+    border-color: var(--nf-accent);
+    color: var(--nf-accent);
+    box-shadow: 0 8px 32px rgba(255, 51, 85, 0.15);
+}
+
+.notfound-container.is-bug-mode .notfound-cta--primary:hover {
+    box-shadow: 0 8px 32px rgba(255, 51, 85, 0.25);
+}
