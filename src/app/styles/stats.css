@@ -1,0 +1,48 @@
+/* ── Stats ─────────────────────────────────────────────────── */
+.stats {
+    padding: clamp(4rem, 8vw, 6rem) clamp(2rem, 5vw, 4rem);
+}
+
+.stats__grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 2rem;
+    text-align: center;
+}
+
+.stat {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    padding: 2rem;
+    border: 1px solid transparent;
+    border-radius: 16px;
+    transition: all 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+.layer__dark .stat:hover {
+    border-color: var(--border);
+    background: rgba(255, 255, 255, 0.02);
+    transform: translateY(-8px) scale(1.02);
+}
+
+.stat__number {
+    font-family: var(--font-outfit), sans-serif;
+    font-size: clamp(3rem, 6vw, 5rem);
+    font-weight: 900;
+    line-height: 1;
+    color: var(--text);
+    transition: transform 0.4s ease;
+}
+
+.layer__dark .stat:hover .stat__number {
+    transform: scale(1.08);
+}
+
+.stat__label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text-subtle);
+}

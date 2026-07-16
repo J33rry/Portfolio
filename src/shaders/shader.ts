@@ -211,4 +211,3 @@ export const dissolveFragmentShader = `
     gl_FragColor = vec4(uColor, alpha);
   }
 `;
-

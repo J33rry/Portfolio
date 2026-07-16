@@ -1,0 +1,60 @@
+/* ── Custom Font Declarations ────────────────────────────── */
+@font-face {
+    font-family: "Jaapokki";
+    src: url("/fonts/Jaapokki-Regular.otf") format("opentype");
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: "JaapokkiEnchance";
+    src: url("/fonts/Jaapokkienchance-Regular.otf") format("opentype");
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: "JaapokkiSubtract";
+    src: url("/fonts/Jaapokkisubtract-Regular.otf") format("opentype");
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: "Kirke";
+    src: url("/fonts/Kirke-Light.ttf") format("truetype");
+    font-weight: 300;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: "Kirke";
+    src: url("/fonts/Kirke-Regular.ttf") format("truetype");
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: "Nesiota";
+    src: url("/fonts/Nesiota-Regular.otf") format("opentype");
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+}
+
+:root {
+    --font-jaapokki: "Jaapokki", sans-serif;
+    --font-jaapokki-enchance: "JaapokkiEnchance", sans-serif;
+    --font-jaapokki-subtract: "JaapokkiSubtract", sans-serif;
+    --font-kirke: "Kirke", serif;
+    --font-nesiota: "Nesiota", sans-serif;
+}
+
+/* ============================================================
+   ANIL.DEV PORTFOLIO — STYLES (Migrated to Next.js + Tailwind v4)
+   ============================================================ */

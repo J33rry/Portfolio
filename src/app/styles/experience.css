@@ -1,0 +1,55 @@
+/* ── Experience ───────────────────────────────────────────── */
+.experience {
+    padding: clamp(6rem, 12vw, 10rem) clamp(2rem, 5vw, 4rem);
+}
+
+.experience__list {
+    display: flex;
+    flex-direction: column;
+}
+
+.experience__item {
+    display: grid;
+    grid-template-columns: 200px 1fr;
+    gap: 3rem;
+    padding: 3rem 0;
+    border-top: 1px solid var(--border);
+    align-items: start;
+}
+
+.experience__item:last-child {
+    border-bottom: 1px solid var(--border);
+}
+
+.experience__period {
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: var(--text-subtle);
+    letter-spacing: 0.05em;
+}
+
+.experience__info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.experience__role {
+    font-size: clamp(1.5rem, 3vw, 2.2rem);
+    font-weight: 700;
+    color: var(--text);
+}
+
+.experience__company {
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--accent);
+}
+
+.experience__desc {
+    font-size: 0.95rem;
+    line-height: 1.7;
+    color: var(--text-subtle);
+    max-width: 600px;
+    margin-top: 0.5rem;
+}

@@ -1,0 +1,39 @@
+/* ── Testimonials ──────────────────────────────────────────── */
+.testimonials {
+    padding: clamp(6rem, 12vw, 10rem) clamp(2rem, 5vw, 4rem);
+}
+
+.testimonials__grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2rem;
+}
+
+.testimonial {
+    padding: 2.5rem;
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 2rem;
+    background: rgba(255, 255, 255, 0.02);
+    backdrop-filter: blur(4px);
+}
+
+.testimonial__text {
+    font-family: var(--font-kirke), var(--font-inter), sans-serif;
+    font-size: 1.05rem;
+    line-height: 1.75;
+    font-weight: 300;
+    color: var(--text);
+    font-style: normal;
+}
+
+.testimonial__cite {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--accent);
+    font-style: normal;
+    letter-spacing: 0.03em;
+}

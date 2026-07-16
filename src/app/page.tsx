@@ -102,11 +102,13 @@ export default function Home() {
                 {
                     canvas: dissolveDarkCanvasRef.current,
                     wrapperId: "hero-dissolve-dark",
+                    // color: { r: 0.5, g: 0.961, b: 0.969 }, // #f5f5f7
                     color: { r: 0.961, g: 0.961, b: 0.969 }, // #f5f5f7
                 },
                 {
                     canvas: dissolveRedCanvasRef.current,
                     wrapperId: "hero-dissolve-red",
+                    // color: { r: 0.3, g: 0.02, b: 0.031 }, // #1a0508
                     color: { r: 0.102, g: 0.02, b: 0.031 }, // #1a0508
                 },
             ];
@@ -187,7 +189,7 @@ export default function Home() {
                         const localScroll = scroll - wrapperTop;
                         const progress = Math.min(
                             Math.max((localScroll / scrollableDistance) * 2, 0),
-                            1.01,
+                            1.0,
                         );
                         if (dissolveMaterials[i]) {
                             dissolveMaterials[i].uniforms.uProgress.value =
@@ -211,8 +213,8 @@ export default function Home() {
             dissolveAnimate();
 
             // ── WebGL Fluid Mask Simulation Setup ────────────────
-            const decay = 0.97;
-            const maskResolution = 400; // longest side of the offscreen mask canvas, in px
+            const decay = 0.92;
+            const maskResolution = 1000;
 
             const maskCanvas = document.createElement("canvas");
             const renderer = new THREE.WebGLRenderer({

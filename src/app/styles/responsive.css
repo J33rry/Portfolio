@@ -1,0 +1,180 @@
+/* ── Responsive ───────────────────────────────────────────── */
+@media (max-width: 1024px) {
+    .hero__inner {
+        grid-template-columns: 1fr;
+        gap: 3rem;
+    }
+
+    .hero__portrait-side {
+        min-height: 450px;
+    }
+
+    .hero__image-wrapper {
+        width: clamp(260px, 40vw, 380px);
+    }
+
+    .hero__float-card--tl {
+        left: 0;
+        top: 2%;
+    }
+    .hero__float-card--bl {
+        left: -5%;
+    }
+    .hero__float-card--tr {
+        right: 0;
+    }
+    .hero__float-card--br {
+        right: -5%;
+    }
+
+    .hero__content {
+        text-align: center;
+        align-items: center;
+    }
+
+    .hero__tech-stack {
+        justify-content: center;
+        max-width: 100%;
+    }
+
+    .hero__socials {
+        justify-content: center;
+    }
+
+    .hero__ctas {
+        justify-content: center;
+    }
+
+    .hero__subtitle {
+        max-width: 100%;
+    }
+
+    .testimonials__grid {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+    }
+
+    .about__body {
+        grid-template-columns: 1fr;
+        gap: 3rem;
+    }
+
+    .experience__item {
+        grid-template-columns: 1fr;
+        gap: 0.75rem;
+    }
+}
+
+@media (max-width: 768px) {
+    /* Transform standard links wrapper into drawer overlay styles are now default */
+
+    .hero__title {
+        font-size: clamp(2.5rem, 10vw, 4rem);
+    }
+
+    .hero__float-card {
+        display: none;
+    }
+
+    .hero__decor {
+        display: none;
+    }
+
+    .hero__portrait-side {
+        min-height: 350px;
+    }
+
+    .hero__image-wrapper {
+        width: clamp(200px, 50vw, 300px);
+    }
+
+    .stats__grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .project {
+        grid-template-columns: 30px 1fr 50px;
+        gap: 1rem;
+    }
+
+    .project__number {
+        font-size: 0.85rem;
+    }
+
+    .contact__links {
+        flex-direction: column;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .footer {
+        flex-direction: column;
+        gap: 0.75rem;
+        text-align: center;
+    }
+
+    .reveal-btn {
+        width: 65px;
+        height: 65px;
+        bottom: 1rem;
+        right: 1rem;
+    }
+
+    .about__float {
+        display: none;
+    }
+}
+
+@media (max-width: 480px) {
+    .nav {
+        padding: 1rem 1.5rem;
+    }
+
+    .hero {
+        padding: 0 1.5rem;
+    }
+
+    .about,
+    .work,
+    .experience,
+    .stats,
+    .testimonials,
+    .contact {
+        padding-left: 1.5rem;
+        padding-right: 1.5rem;
+    }
+
+    .stats__grid {
+        grid-template-columns: 1fr 1fr;
+        gap: 1rem;
+    }
+}
+
+/* ── Reduced Motion ───────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+    .layer__red {
+        transition: none !important;
+    }
+
+    .cursor {
+        transition: none !important;
+    }
+
+    .marquee__track {
+        animation: none !important;
+    }
+
+    .reveal-btn__svg {
+        animation: none !important;
+    }
+
+    .hero__scroll-line::after {
+        animation: none !important;
+    }
+
+    .js-anim--lines--sim {
+        opacity: 1 !important;
+        transform: none !important;
+        transition: none !important;
+    }
+}

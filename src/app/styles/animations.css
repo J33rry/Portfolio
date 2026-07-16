@@ -1,0 +1,145 @@
+@keyframes geoDotPulse {
+    0%,
+    100% {
+        r: 2.5;
+        opacity: 0.4;
+    }
+    50% {
+        r: 4;
+        opacity: 0.8;
+    }
+}
+
+@keyframes availPulse {
+    0%,
+    100% {
+        opacity: 1;
+        box-shadow: 0 0 0 0 rgba(74, 222, 128, 0.4);
+    }
+    50% {
+        opacity: 0.7;
+        box-shadow: 0 0 0 6px rgba(74, 222, 128, 0);
+    }
+}
+
+@keyframes decorSpin {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+@keyframes scrollLine {
+    0% {
+        left: -100%;
+    }
+    100% {
+        left: 100%;
+    }
+}
+
+@keyframes marqueeScroll {
+    0% {
+        transform: translateX(0);
+    }
+    100% {
+        transform: translateX(-50%);
+    }
+}
+
+@keyframes orbitSpin {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+@keyframes spinText {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+@keyframes orbFloat {
+    0%,
+    100% {
+        transform: translate(0, 0);
+    }
+    25% {
+        transform: translate(30px, -40px);
+    }
+    50% {
+        transform: translate(-20px, 20px);
+    }
+    75% {
+        transform: translate(40px, 30px);
+    }
+}
+
+@keyframes heroRingSpin {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+@keyframes crossPulse {
+    0%,
+    100% {
+        opacity: 0.25;
+        transform: rotate(0deg);
+    }
+    50% {
+        opacity: 0.5;
+        transform: rotate(90deg);
+    }
+}
+
+@keyframes dotPulse {
+    0%,
+    100% {
+        opacity: 0.15;
+        transform: scale(1);
+    }
+    50% {
+        opacity: 0.6;
+        transform: scale(1.5);
+    }
+}
+/* ── JS Animation Initial States ──────────────────────────── */
+/* Character slide-up: start hidden below */
+.layer__dark .hero__line-inner.js-anim--chars .char {
+    transform: translateY(110%);
+    display: inline-block;
+}
+
+/* Line reveal: start invisible */
+.js-anim--lines--sim {
+    opacity: 0;
+    transform: translateY(30px);
+}
+
+/* Visible state (added by JS) */
+.js-anim--lines--sim.is-visible {
+    opacity: 1;
+    transform: translateY(0);
+    transition:
+        opacity 0.7s cubic-bezier(0.25, 1, 0.5, 1),
+        transform 0.7s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+/* Red layer: no intro animation, always visible */
+.layer__red .js-anim--lines--sim,
+.layer__red .hero__line-inner {
+    opacity: 1 !important;
+    transform: none !important;
+}

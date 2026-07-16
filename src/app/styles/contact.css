@@ -1,0 +1,71 @@
+/* ── Contact ──────────────────────────────────────────────── */
+.contact {
+    padding: clamp(6rem, 12vw, 10rem) clamp(2rem, 5vw, 4rem);
+    text-align: center;
+}
+
+.contact .section__header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.contact__body {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2.5rem;
+}
+
+.contact__email {
+    font-family: var(--font-outfit), sans-serif;
+    font-size: clamp(1.5rem, 4vw, 3rem);
+    font-weight: 700;
+    color: var(--text);
+    position: relative;
+    transition: color 0.3s ease;
+    padding: 1rem 2rem;
+    border-radius: 12px;
+}
+
+.layer__dark .contact__email:hover {
+    color: var(--accent);
+}
+
+.layer__dark .contact__email::after {
+    content: "";
+    position: absolute;
+    bottom: -4px;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background: var(--accent);
+    transition: width 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+.layer__dark .contact__email:hover::after {
+    width: 100%;
+}
+
+.contact__links {
+    display: flex;
+    gap: 2rem;
+}
+
+.contact__link {
+    font-size: 0.85rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text-subtle);
+    padding: 0.8rem 1.5rem;
+    border: 1px solid var(--border);
+    border-radius: 100px;
+    transition: all 0.3s ease;
+}
+
+.layer__dark .contact__link:hover {
+    color: var(--text);
+    border-color: var(--accent);
+    background: rgba(201, 185, 154, 0.08);
+}
